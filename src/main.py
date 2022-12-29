@@ -1,0 +1,2 @@
+import nox
+print("ok")
