@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "sequencemodellab"
+version = "0.1.0"
+description = ""
+authors = ["YuvalMilo <yuv.milo@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/YuvMilo/SequenceModelLab"
+repository = "https://github.com/YuvMilo/SequenceModelLab"
+keywords = ["S4","Sequence Models"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+black = "^22.12.0"
+flake8 = "^6.0.0"
+flake8-bandit = "^4.1.1"
+flake8-black = "^0.3.6"
+flake8-bugbear = "^22.12.6"
+flake8-import-order = "^0.18.2"
+safety = "^2.3.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
