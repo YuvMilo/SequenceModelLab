@@ -1,2 +1,0 @@
-import nox
-print("ok")

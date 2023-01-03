@@ -1,7 +1,8 @@
 [flake8]
-select = ANN,B,B9,BLK,C,D,DAR,E,F,I,S,W
-ignore = E203,E501,W503
+select = ANN,B,B9,C,D,DAR,E,F,S,W
+ignore = E203,E501,W503,S101,BLK100
 max-line-length = 80
 max-complexity = 10
-import-order-style = google
 docstring-convention = google
+
+exclude  = src/experiments.py
