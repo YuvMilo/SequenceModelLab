@@ -21,10 +21,11 @@ def train(model, dl, criterion, optimizer, num_epochs, logger, plot=True):
             loss.backward()
             optimizer.step()
         logger.log(epoch_loss / len(dl), None, epoch)
+
         if plot and (epoch % 10 == 0):
             plt.close("all")
-            plt.plot(output[0, :].detach().numpy(), color="orange")
-            plt.plot(labels[0, :].detach().numpy(), color="red")
-            plt.plot(input_data[0, :].detach().numpy(), color="blue")
+            plt.plot(output[0, :300].detach().numpy(), color="orange")
+            plt.plot(labels[0, :300].detach().numpy(), color="red")
+            plt.plot(input_data[0, :300].detach().numpy(), color="blue")
             plt.show()
             pass

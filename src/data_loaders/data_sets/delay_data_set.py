@@ -44,7 +44,7 @@ class DelayedSignalDatasetRegenerated(torch.utils.data.TensorDataset):
 
     def __getitem__(self, index):
         X = self.signal_generator.generate(num_signals=1,
-                                      signal_length=self.seq_length)
+                                           signal_length=self.seq_length)
         X = X.unsqueeze(-1)
 
         if self.lag_type == "zero":
@@ -55,4 +55,3 @@ class DelayedSignalDatasetRegenerated(torch.utils.data.TensorDataset):
 
     def __len__(self):
         return self.samples_num
-
