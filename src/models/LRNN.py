@@ -6,8 +6,8 @@ class LinearRNN(nn.Module):
 
     def __init__(self, hidden_dim, input_size=1, output_size=1):
         super().__init__()
-        self.W_ih = nn.Parameter(torch.randn(input_size, hidden_dim)*0.01)
-        self.W_hh = nn.Parameter(torch.randn(hidden_dim, hidden_dim)*0.001)
+        self.W_ih = nn.Parameter(torch.randn(input_size, hidden_dim) * 0.01)
+        self.W_hh = nn.Parameter(torch.randn(hidden_dim, hidden_dim) * 0.001)
         self.b_ih = nn.Parameter(torch.zeros(hidden_dim))
         self.b_hh = nn.Parameter(torch.zeros(hidden_dim))
         self.W_ho = nn.Parameter(torch.randn(hidden_dim, output_size))
@@ -25,7 +25,8 @@ class LinearRNN(nn.Module):
         out = []
         for t in range(sequence_length):
             x_t = x[:, t, :]
-            h = torch.mm(x_t, self.W_ih) + self.b_ih + torch.mm(h, self.W_hh) + self.b_hh
+            h = torch.mm(x_t, self.W_ih) +\
+                self.b_ih + torch.mm(h, self.W_hh) + self.b_hh
             cur_out = torch.mm(h, self.W_ho) + self.b_ho
             out.append(cur_out)
 

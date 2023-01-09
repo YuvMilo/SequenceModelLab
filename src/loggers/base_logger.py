@@ -6,5 +6,11 @@ class BaseLogger:
     def __init__(self):
         self.history = defaultdict(list)
 
-    def log(self, loss, epoch, model=None):
+    def log(self, loss, epoch_num, data_loader, model=None):
         self.history["loss"].append(loss)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass

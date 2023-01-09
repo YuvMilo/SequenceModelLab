@@ -22,6 +22,33 @@ class ConstSignalGenerator(SignalGenerator):
         return torch.fill(signals, self.const)
 
 
+class NormalNoiseCumSignalGenerator(SignalGenerator):
+    def __init__(self, std=1, mean=0):
+        self.std = std
+        self.mean = mean
+
+    def generate(self, num_signals, signal_length, signal_dim=1):
+        if signal_dim != 1:
+            raise NotImplementedError("ConstSignalGenerator only supports signal dim 1")
+
+        signals = torch.randn([num_signals, signal_length])
+        signals = torch.cumsum(signals, dim=1)
+        return signals
+
+
+class NormalNoiseSignalGenerator(SignalGenerator):
+    def __init__(self, std=1, mean=0):
+        self.std = std
+        self.mean = mean
+
+    def generate(self, num_signals, signal_length, signal_dim=1):
+        if signal_dim != 1:
+            raise NotImplementedError("ConstSignalGenerator only supports signal dim 1")
+
+        signals = torch.randn([num_signals, signal_length])
+        return signals
+
+
 class WhiteSignalGenerator(SignalGenerator):
     def __init__(self, dt=1e-2, freq=1.0):
         self.dt = dt

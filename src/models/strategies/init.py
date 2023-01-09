@@ -20,7 +20,7 @@ class DiagHippoInitStrategy(BaseSSMInitStrategy):
 
         num_hidden_state_in_practice = num_hidden_state // 2
 
-        A_real = 0.5 * torch.ones(num_hidden_state_in_practice)
+        A_real = -0.5 * torch.ones(num_hidden_state_in_practice)
         A_imag = math.pi * torch.arange(num_hidden_state_in_practice)
         A = A_real + 1j * A_imag
 

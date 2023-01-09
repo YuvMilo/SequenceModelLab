@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -10,6 +11,8 @@ class SMMModel(nn.Module):
         self.ssm_param_strategy = ssm_param_strategy
         self.ssm_calc_strategy = ssm_calc_strategy
         self.num_hidden_state = num_hidden_state
+        self.input_dim = input_dim
+        self.output_dim = output_dim
         p_A, p_B, p_C, p_D = ssm_param_strategy.init_param(
             num_hidden_state=num_hidden_state,
             input_dim=input_dim,
@@ -33,3 +36,29 @@ class SMMModel(nn.Module):
 
         out = self.ssm_calc_strategy.calc(x, A, B, C, D)
         return out
+
+    def get_kernel(self, ker_len):
+        if self.input_dim!=1 or self.output_dim!=1:
+            raise NotImplementedError("get_kernel are only implemented for 1D to 1D")
+        # This could be done more efficiently in the not 1D case
+        x = torch.zeros([1, ker_len, 1])
+        x[0, 0, 0] = 1
+        ker = self.forward(x)
+        ker = ker[0, :, 0]
+        return ker
+
+    def get_params(self):
+        A, B, C, D = self.ssm_param_strategy.get_param(self.parameterized_A,
+                                                       self.parameterized_B,
+                                                       self.parameterized_C,
+                                                       self.parameterized_D)
+        return A, B, C, D
+
+    def get_num_hidden_state(self):
+        return self.num_hidden_state
+
+    def get_input_dim(self):
+        return self.input_dim
+
+    def get_output_dim(self):
+        return self.output_dim
