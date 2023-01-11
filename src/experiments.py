@@ -220,86 +220,6 @@ def experiment_with_lag():
               optimizer=optimizer)
 
 
-def experiment_with_lag_fast_loss():
-    start_lag = 3
-    end_lag = 80
-    lag_jumps = 3
-    seq_len = 400
-    hidden_size = 133
-    epochs = 5000
-
-    def get_saving_path_for_exp(lag, model):
-        return ".\\results\\lag_exp\\"+"fast_"+model+"_"+str(lag)
-
-    for lag in range(start_lag, end_lag, lag_jumps):
-        hippo_diag_model = get_diag_hippo_model(num_hidden_state=hidden_size)
-        hippo_diag_model_disc_param = get_hippo_diag_model_disc_param(num_hidden_state=hidden_size)
-        full_ssm_big_diag = get_full_ssm(
-            num_hidden_state=hidden_size,
-            A_init_func=lambda n: 0.9 * torch.eye(n) + 0.01 * torch.randn([n, n])/n,
-            B_init_std=1 / (hidden_size ** 0.5),
-            C_init_std=1 / (hidden_size ** 0.5)
-        )
-        full_ssm_small_diag = get_full_ssm(
-            num_hidden_state=hidden_size,
-            A_init_func=lambda n: 0.8 * torch.eye(n) + 0.01 * torch.randn([n, n])/n,
-            B_init_std=1 / (hidden_size ** 0.5),
-            C_init_std=1 / (hidden_size ** 0.5)
-        )
-
-        saving_path = get_saving_path_for_exp(lag, model="fssm_bd")
-        print(os.path.basename(saving_path))
-        with SSMLogger(saving_path=saving_path) as logger:
-            optimizer = torch.optim.Adam(full_ssm_big_diag.parameters())
-            train_smm_random_noise_fast(
-                model=full_ssm_big_diag,
-                lag=lag,
-                seq_len=seq_len,
-                logger=logger,
-                num_epochs=epochs,
-                optimizer=optimizer,
-                min_cut=epochs
-            )
-
-        saving_path = get_saving_path_for_exp(lag, model="fssm_sd")
-        print(os.path.basename(saving_path))
-        with SSMLogger(saving_path=saving_path) as logger:
-            optimizer = torch.optim.Adam(full_ssm_small_diag.parameters())
-            train_smm_random_noise_fast(
-                model=full_ssm_small_diag,
-                lag=lag,
-                seq_len=seq_len,
-                logger=logger,
-                num_epochs=epochs,
-                optimizer=optimizer,
-                min_cut=epochs
-            )
-
-        saving_path = get_saving_path_for_exp(lag, model="hippo")
-        print(os.path.basename(saving_path))
-        with SSMLogger(saving_path=saving_path) as logger:
-            optimizer = torch.optim.Adam(hippo_diag_model.parameters())
-            train_smm_random_noise_fast(
-                  model=hippo_diag_model,
-                  lag=lag,
-                  seq_len=seq_len,
-                  logger=logger,
-                  num_epochs=epochs,
-                  optimizer=optimizer)
-
-        saving_path = get_saving_path_for_exp(lag, model="hippo_disc")
-        print(os.path.basename(saving_path))
-        with SSMLogger(saving_path=saving_path) as logger:
-            optimizer = torch.optim.Adam(hippo_diag_model_disc_param.parameters())
-            train_smm_random_noise_fast(
-                  model=hippo_diag_model_disc_param,
-                  lag=lag,
-                  seq_len=seq_len,
-                  logger=logger,
-                  num_epochs=epochs,
-                  optimizer=optimizer)
-
-
 def playing():
     lag = 100
     seq_len = lag*3
@@ -349,6 +269,210 @@ def playing():
     pass
 
 
+def experiment_with_lag_fast_loss():
+    start_lag = 129
+    end_lag = 200
+    lag_jumps = 3
+    seq_len = 400
+    hidden_size = 133
+    epochs = 5000
+
+    def get_saving_path_for_exp(lag, model):
+        return ".\\results\\lag_exp\\"+"fast_"+model+"_"+str(lag)
+
+    for lag in range(start_lag, end_lag, lag_jumps):
+        hippo_diag_model = get_diag_hippo_model(num_hidden_state=hidden_size)
+        hippo_diag_model_disc_param = get_hippo_diag_model_disc_param(num_hidden_state=hidden_size)
+        full_ssm_big_diag = get_full_ssm(
+            num_hidden_state=hidden_size,
+            A_init_func=lambda n: 0.9 * torch.eye(n) + 0.01 * torch.randn([n, n])/n,
+            B_init_std=1 / (hidden_size ** 0.5),
+            C_init_std=1 / (hidden_size ** 0.5)
+        )
+        full_ssm_small_diag = get_full_ssm(
+            num_hidden_state=hidden_size,
+            A_init_func=lambda n: 0.8 * torch.eye(n) + 0.01 * torch.randn([n, n])/n,
+            B_init_std=1 / (hidden_size ** 0.5),
+            C_init_std=1 / (hidden_size ** 0.5)
+        )
+
+        full_ssm_huge_diag = get_full_ssm(
+            num_hidden_state=hidden_size,
+            A_init_func=lambda n: 0.95 * torch.eye(n) + 0.01 * torch.randn([n, n]) / n,
+            B_init_std=1 / (hidden_size ** 0.5),
+            C_init_std=1 / (hidden_size ** 0.5)
+        )
+
+        # saving_path = get_saving_path_for_exp(lag, model="fssm_sd")
+        # print(os.path.basename(saving_path))
+        # with SSMLogger(saving_path=saving_path) as logger:
+        #     optimizer = torch.optim.Adam(full_ssm_small_diag.parameters())
+        #     train_smm_random_noise_fast(
+        #         model=full_ssm_small_diag,
+        #         lag=lag,
+        #         seq_len=seq_len,
+        #         logger=logger,
+        #         num_epochs=epochs,
+        #         optimizer=optimizer,
+        #         min_cut=epochs
+        #     )
+
+        saving_path = get_saving_path_for_exp(lag, model="fssm_bd")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(full_ssm_big_diag.parameters())
+            train_smm_random_noise_fast(
+                model=full_ssm_big_diag,
+                lag=lag,
+                seq_len=seq_len,
+                logger=logger,
+                num_epochs=epochs,
+                optimizer=optimizer,
+                min_cut=epochs
+            )
+
+        saving_path = get_saving_path_for_exp(lag, model="fssm_ud")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(full_ssm_huge_diag.parameters())
+            train_smm_random_noise_fast(
+                model=full_ssm_huge_diag,
+                lag=lag,
+                seq_len=seq_len,
+                logger=logger,
+                num_epochs=epochs,
+                optimizer=optimizer,
+                min_cut=epochs
+            )
+
+        saving_path = get_saving_path_for_exp(lag, model="hippo")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(hippo_diag_model.parameters())
+            train_smm_random_noise_fast(
+                  model=hippo_diag_model,
+                  lag=lag,
+                  seq_len=seq_len,
+                  logger=logger,
+                  num_epochs=epochs,
+                  optimizer=optimizer)
+
+        saving_path = get_saving_path_for_exp(lag, model="hippo_disc")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(hippo_diag_model_disc_param.parameters())
+            train_smm_random_noise_fast(
+                  model=hippo_diag_model_disc_param,
+                  lag=lag,
+                  seq_len=seq_len,
+                  logger=logger,
+                  num_epochs=epochs,
+                  optimizer=optimizer)
+
+
+def experiment_with_big_seq():
+    start_lag = 10
+    end_lag = 500
+    lag_jumps = 10
+    seq_len = 1000
+    hidden_size = 100
+    epochs = 1000
+
+    def get_saving_path_for_exp(lag, model):
+        return ".\\results\\lag_exp_long\\"+"fast_"+model+"_"+str(lag)
+
+    for lag in range(start_lag, end_lag, lag_jumps):
+        hippo_diag_model = get_diag_hippo_model(num_hidden_state=hidden_size)
+        hippo_diag_model_disc_param = get_hippo_diag_model_disc_param(num_hidden_state=hidden_size)
+        full_ssm_big_diag = get_full_ssm(
+            num_hidden_state=hidden_size,
+            A_init_func=lambda n: 0.9 * torch.eye(n) + 0.01 * torch.randn([n, n])/n,
+            B_init_std=1 / (hidden_size ** 0.5),
+            C_init_std=1 / (hidden_size ** 0.5)
+        )
+        full_ssm_small_diag = get_full_ssm(
+            num_hidden_state=hidden_size,
+            A_init_func=lambda n: 0.8 * torch.eye(n) + 0.01 * torch.randn([n, n])/n,
+            B_init_std=1 / (hidden_size ** 0.5),
+            C_init_std=1 / (hidden_size ** 0.5)
+        )
+
+        full_ssm_huge_diag = get_full_ssm(
+            num_hidden_state=hidden_size,
+            A_init_func=lambda n: 0.95 * torch.eye(n) + 0.01 * torch.randn([n, n]) / n,
+            B_init_std=1 / (hidden_size ** 0.5),
+            C_init_std=1 / (hidden_size ** 0.5)
+        )
+
+        # saving_path = get_saving_path_for_exp(lag, model="fssm_sd")
+        # print(os.path.basename(saving_path))
+        # with SSMLogger(saving_path=saving_path) as logger:
+        #     optimizer = torch.optim.Adam(full_ssm_small_diag.parameters())
+        #     train_smm_random_noise_fast(
+        #         model=full_ssm_small_diag,
+        #         lag=lag,
+        #         seq_len=seq_len,
+        #         logger=logger,
+        #         num_epochs=epochs,
+        #         optimizer=optimizer,
+        #         min_cut=epochs
+        #     )
+
+        saving_path = get_saving_path_for_exp(lag, model="fssm_bd")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(full_ssm_big_diag.parameters())
+            train_smm_random_noise_fast(
+                model=full_ssm_big_diag,
+                lag=lag,
+                seq_len=seq_len,
+                logger=logger,
+                num_epochs=epochs,
+                optimizer=optimizer,
+                min_cut=epochs
+            )
+
+        saving_path = get_saving_path_for_exp(lag, model="fssm_ud")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(full_ssm_huge_diag.parameters())
+            train_smm_random_noise_fast(
+                model=full_ssm_huge_diag,
+                lag=lag,
+                seq_len=seq_len,
+                logger=logger,
+                num_epochs=epochs,
+                optimizer=optimizer,
+                min_cut=epochs
+            )
+
+        saving_path = get_saving_path_for_exp(lag, model="hippo")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(hippo_diag_model.parameters())
+            train_smm_random_noise_fast(
+                  model=hippo_diag_model,
+                  lag=lag,
+                  seq_len=seq_len,
+                  logger=logger,
+                  num_epochs=epochs,
+                  optimizer=optimizer)
+
+        saving_path = get_saving_path_for_exp(lag, model="hippo_disc")
+        print(os.path.basename(saving_path))
+        with SSMLogger(saving_path=saving_path) as logger:
+            optimizer = torch.optim.Adam(hippo_diag_model_disc_param.parameters())
+            train_smm_random_noise_fast(
+                  model=hippo_diag_model_disc_param,
+                  lag=lag,
+                  seq_len=seq_len,
+                  logger=logger,
+                  num_epochs=epochs,
+                  optimizer=optimizer)
+
+
+
 if __name__ == "__main__":
     # experiment_with_lag()
+    # makeing_missed()
     experiment_with_lag_fast_loss()

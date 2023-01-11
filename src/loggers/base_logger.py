@@ -9,8 +9,11 @@ class BaseLogger:
     def log(self, loss, epoch_num, data_loader, model=None):
         self.history["loss"].append(loss)
 
+    def save(self):
+        raise NotImplementedError
+
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+        self.save()

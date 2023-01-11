@@ -28,13 +28,13 @@ class SSMLogger(BaseLogger):
         self.history["loss"].append(LoggingEntity(loss, epoch_num))
 
         A, B, C, D = model.get_params()
-        self.history["A"].append(LoggingEntity(A, epoch_num))
-        self.history["B"].append(LoggingEntity(B, epoch_num))
-        self.history["C"].append(LoggingEntity(C, epoch_num))
-        self.history["D"].append(LoggingEntity(D, epoch_num))
+        self.history["A"].append(LoggingEntity(A.detach().numpy(), epoch_num))
+        self.history["B"].append(LoggingEntity(B.detach().numpy(), epoch_num))
+        self.history["C"].append(LoggingEntity(C.detach().numpy(), epoch_num))
+        self.history["D"].append(LoggingEntity(D.detach().numpy(), epoch_num))
 
-        kernel = model.get_kernel(self.kernel_saving_size)
-        self.history["kernel"].append(LoggingEntity(kernel, epoch_num))
+        kernel = model.get_kernel(self.kernel_saving_size).detach()
+        self.history["kernel"].append(LoggingEntity(kernel.detach().numpy(), epoch_num))
 
         if epoch_num % self.saving_freq == 0:
             self.save()

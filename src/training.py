@@ -6,10 +6,12 @@ import matplotlib.pyplot as plt
 
 def l2_loss_with_random_noise(model, lag, seq_len):
     k = model.get_kernel(seq_len)
-    bias = torch.abs(1 - k[lag])
+    # v of ind rv is sum of rv variance
+    # v of a*r where r is normal, is a**2
     variance = torch.sum(torch.abs(k[:lag]) ** 2)
     variance += torch.sum(k[lag+1:] ** 2)
-    loss = bias ** 2 + variance
+    variance += torch.abs(1 - k[lag]) ** 2
+    loss = variance
     return loss
 
 
