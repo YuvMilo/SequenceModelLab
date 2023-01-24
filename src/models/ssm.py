@@ -5,7 +5,7 @@ import torch.nn as nn
 class SMMModel(nn.Module):
 
     def __init__(self, ssm_param_strategy, ssm_calc_strategy, num_hidden_state,
-                 input_dim, output_dim, trainable_param_list):
+                 input_dim, output_dim, trainable_param_list, device):
         super().__init__()
 
         self.ssm_param_strategy = ssm_param_strategy
@@ -13,36 +13,42 @@ class SMMModel(nn.Module):
         self.num_hidden_state = num_hidden_state
         self.input_dim = input_dim
         self.output_dim = output_dim
+        # TODO - This should be a "running context"
+        # Should be refactored to be a class
+        self.device = device
         p_A, p_B, p_C, p_D = ssm_param_strategy.init_param(
             num_hidden_state=num_hidden_state,
             input_dim=input_dim,
-            output_dim=output_dim
+            output_dim=output_dim,
+            device=self.device
         )
 
-        self.parameterized_A = nn.Parameter(p_A,
+        self.parameterized_A = nn.Parameter(p_A.to(device),
                                             requires_grad="A" in trainable_param_list)
-        self.parameterized_B = nn.Parameter(p_B,
+        self.parameterized_B = nn.Parameter(p_B.to(device),
                                             requires_grad="B" in trainable_param_list)
-        self.parameterized_C = nn.Parameter(p_C,
+        self.parameterized_C = nn.Parameter(p_C.to(device),
                                             requires_grad="C" in trainable_param_list)
-        self.parameterized_D = nn.Parameter(p_D,
+        self.parameterized_D = nn.Parameter(p_D.to(device),
                                             requires_grad="D" in trainable_param_list)
 
     def forward(self, x):
         A, B, C, D = self.ssm_param_strategy.get_param(self.parameterized_A,
                                                        self.parameterized_B,
                                                        self.parameterized_C,
-                                                       self.parameterized_D)
+                                                       self.parameterized_D,
+                                                       self.device)
 
-        out = self.ssm_calc_strategy.calc(x, A, B, C, D)
+        out = self.ssm_calc_strategy.calc(x, A, B, C, D, self.device)
         return out
 
     def get_kernel(self, ker_len):
-        if self.input_dim!=1 or self.output_dim!=1:
+        if self.input_dim != 1 or self.output_dim != 1:
             raise NotImplementedError("get_kernel are only implemented for 1D to 1D")
         # This could be done more efficiently in the not 1D case
         x = torch.zeros([1, ker_len, 1])
         x[0, 0, 0] = 1
+        x = x.to(self.device)
         ker = self.forward(x)
         ker = ker[0, :, 0]
         return ker
@@ -51,7 +57,8 @@ class SMMModel(nn.Module):
         A, B, C, D = self.ssm_param_strategy.get_param(self.parameterized_A,
                                                        self.parameterized_B,
                                                        self.parameterized_C,
-                                                       self.parameterized_D)
+                                                       self.parameterized_D,
+                                                       device=self.device)
         return A, B, C, D
 
     def get_num_hidden_state(self):

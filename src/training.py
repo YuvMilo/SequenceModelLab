@@ -9,7 +9,7 @@ def l2_loss_with_random_noise(model, lag, seq_len):
     # v of ind rv is sum of rv variance
     # v of a*r where r is normal, is a**2
     variance = torch.sum(torch.abs(k[:lag]) ** 2)
-    variance += torch.sum(k[lag+1:] ** 2)
+    variance += torch.sum(k[lag + 1:] ** 2)
     variance += torch.abs(1 - k[lag]) ** 2
     loss = variance
     return loss
@@ -28,7 +28,7 @@ def train(model, dl, criterion, optimizer, num_epochs, logger, plot=True):
             # Forward pass
             output = model(input_data)
             loss = criterion(output, labels)
-            epoch_loss += loss.item()
+            epoch_loss += loss.cpu().item()
 
             # Backward pass
             loss.backward()
@@ -47,7 +47,7 @@ def train(model, dl, criterion, optimizer, num_epochs, logger, plot=True):
             axis[0].plot(labels[0, :100].detach().numpy(), color="red")
             axis[0].plot(input_data[0, :100].detach().numpy(), color="blue")
 
-            axis[1].plot(model.get_kernel(1000).detach().numpy(), color="orange")
+            axis[1].plot(model.get_kernel(100).detach().numpy(), color="orange")
 
             axis[2].plot([e.entity for e in logger.history["loss"][-150:]])
             plt.show()
@@ -55,8 +55,8 @@ def train(model, dl, criterion, optimizer, num_epochs, logger, plot=True):
 
 
 def train_smm_random_noise_fast(model, lag, seq_len, optimizer, num_epochs, logger,
-                               plot=False,
-                               min_cut=1000):
+                                plot=False,
+                                min_cut=1000):
 
     # Loop over the epochs
     for epoch in tqdm(range(num_epochs), leave=True):
@@ -73,7 +73,7 @@ def train_smm_random_noise_fast(model, lag, seq_len, optimizer, num_epochs, logg
                    data_loader=None,
                    model=model)
 
-        if plot and (epoch % 50 == 0):
+        if plot and (epoch % 20 == 0):
             plt.close("all")
 
             # TODO - make this a debugging strategy for decoupling
@@ -102,6 +102,6 @@ def train_smm_random_noise_fast(model, lag, seq_len, optimizer, num_epochs, logg
             if len(all_loss) > no_change_time:
                 current_min_loss = np.min(all_loss[-no_change_time:])
                 pre_min_loss = np.min(all_loss[:-no_change_time])
-                if pre_min_loss-current_min_loss < 0.01:
+                if pre_min_loss - current_min_loss < 0.01:
                     logger.save()
                     break

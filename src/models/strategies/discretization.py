@@ -1,13 +1,13 @@
 from src.models.strategies.base import BaseSSMDiscretizationStrategy
 from src.utils import safe_complex_mm
-
+import torch
 
 class BilinearDiagSSMDiscretizationStrategy(BaseSSMDiscretizationStrategy):
 
     def __init__(self):
         super().__init__()
 
-    def discretize(self, dt, A, B, C, D):
+    def discretize(self, dt, A, B, C, D, device):
         left_disc_const = (1 - A / 2 * dt) ** -1
         A = left_disc_const * (1 + A / 2 * dt)
         C = left_disc_const * (C * dt)
@@ -19,8 +19,9 @@ class BilinearSSMDiscretizationStrategy(BaseSSMDiscretizationStrategy):
     def __init__(self):
         super().__init__()
 
-    def discretize(self, dt, A, B, C, D):
-        left_disc_const = (1 - A / 2 * dt).inverse()
-        A = safe_complex_mm(left_disc_const, (1 + A / 2 * dt))
+    def discretize(self, dt, A, B, C, D, device):
+        eye = torch.eye(A.shape[0]).to(device)
+        left_disc_const = (eye - A / 2 * dt).inverse()
+        A = safe_complex_mm(left_disc_const, (eye + A / 2 * dt))
         C = safe_complex_mm((C * dt), left_disc_const)
         return A, B, C, D

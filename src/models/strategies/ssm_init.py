@@ -32,7 +32,7 @@ class DiagHippoInitStrategy(BaseSSMInitStrategy):
         return A, B, C, D
 
 
-class FlexibleHippoInitStrategy(BaseSSMInitStrategy):
+class FlexibleDiagHippoInitStrategy(BaseSSMInitStrategy):
 
     def __init__(self, A_init_func, B_init_func, C_init_func, D_init_func):
         self.A_init_func = A_init_func
@@ -54,7 +54,7 @@ class FlexibleHippoInitStrategy(BaseSSMInitStrategy):
             self.D_init_func(num_hidden_state // 2)
 
 
-class FlexibleInitStrategy(BaseSSMInitStrategy):
+class FlexibleSSMInitStrategy(BaseSSMInitStrategy):
 
     def __init__(self, A_init_func, B_init_func, C_init_func, D_init_func):
         self.A_init_func = A_init_func

@@ -10,7 +10,7 @@ class BaseLogger:
         self.history["loss"].append(loss)
 
     def save(self):
-        raise NotImplementedError
+        pass
 
     def __enter__(self):
         return self

@@ -8,7 +8,7 @@ class RecurrentDiagSMMCalcStrategy(BaseSMMCalcStrategy):
     def __init__(self):
         super().__init__()
 
-    def calc(self, x, A, B, C, D):
+    def calc(self, x, A, B, C, D, device):
         """
         x is of shape B L in_D
         A is of shape H
@@ -18,7 +18,7 @@ class RecurrentDiagSMMCalcStrategy(BaseSMMCalcStrategy):
         """
 
         batch_size, sequence_length, input_size = x.size()
-        h = torch.zeros(A.shape[0], batch_size)
+        h = torch.zeros(A.shape[0], batch_size).to(device)
 
         A = A.view(-1, 1)
         D = D.view(-1, 1)
@@ -47,7 +47,7 @@ class RecurrentSMMCalcStrategy(BaseSMMCalcStrategy):
     def __init__(self):
         super().__init__()
 
-    def calc(self, x, A, B, C, D):
+    def calc(self, x, A, B, C, D, device):
         """
         x is of shape B L in_D
         A is of shape H, H
@@ -57,7 +57,7 @@ class RecurrentSMMCalcStrategy(BaseSMMCalcStrategy):
         """
 
         batch_size, sequence_length, input_size = x.size()
-        h = torch.zeros(A.shape[0], batch_size)
+        h = torch.zeros(A.shape[0], batch_size).to(device)
 
         D = D.view(-1, 1)
 

@@ -3,7 +3,7 @@ class BaseSMMCalcStrategy:
     def __init__(self):
         pass
 
-    def calc(self, x, A, B, C, D):
+    def calc(self, x, A, B, C, D, device):
         raise NotImplementedError("SMMCalcStrategy needs to implement this func")
 
 
