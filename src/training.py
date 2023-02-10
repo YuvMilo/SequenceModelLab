@@ -56,7 +56,8 @@ def train(model, dl, criterion, optimizer, num_epochs, logger, plot=True):
 
 def train_smm_random_noise_fast(model, lag, seq_len, optimizer, num_epochs, logger,
                                 plot=False,
-                                min_cut=1000):
+                                min_cut=1000,
+                                early_stop=True):
 
     # Loop over the epochs
     for epoch in tqdm(range(num_epochs), leave=True):
@@ -65,13 +66,19 @@ def train_smm_random_noise_fast(model, lag, seq_len, optimizer, num_epochs, logg
 
         loss = l2_loss_with_random_noise(model, lag, seq_len)
 
+        if np.isnan(loss.item()):
+            logger.save()
+            break
+
         # Backward pass
         loss.backward()
-        optimizer.step()
+
         logger.log(loss=loss.item(),
                    epoch_num=epoch,
                    data_loader=None,
                    model=model)
+
+        optimizer.step()
 
         if plot and (epoch % 20 == 0):
             plt.close("all")
@@ -87,19 +94,31 @@ def train_smm_random_noise_fast(model, lag, seq_len, optimizer, num_epochs, logg
         # TODO this should be a early stopping strategy
         all_loss = np.array(logger.get_loss_hist())
 
-        if all_loss[-1] > 100:
+        if early_stop and all_loss[-1] > 100:
+            logger.save()
+            break
+
+        if all_loss[-1] > 10**6:
             logger.save()
             break
 
         if (len(all_loss) > min_cut) or (np.min(all_loss) < 0.3):
             arg_min_loss = np.argmin(all_loss) + 1
             ago = len(all_loss) - arg_min_loss
-            if ago > 200:
+            if early_stop and ago > 200:
                 logger.save()
                 break
 
+            # if ago > 2000:
+            #     logger.save()
+            #     break
             no_change_time = 200
-            if len(all_loss) > no_change_time:
+            # if early_stop:
+            #     no_change_time = 200
+            # else:
+            #     no_change_time = 2000
+
+            if early_stop and len(all_loss) > no_change_time:
                 current_min_loss = np.min(all_loss[-no_change_time:])
                 pre_min_loss = np.min(all_loss[:-no_change_time])
                 if pre_min_loss - current_min_loss < 0.01:

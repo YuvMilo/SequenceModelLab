@@ -2,6 +2,7 @@ from src.models.strategies.base import BaseSSMDiscretizationStrategy
 from src.utils import safe_complex_mm
 import torch
 
+
 class BilinearDiagSSMDiscretizationStrategy(BaseSSMDiscretizationStrategy):
 
     def __init__(self):

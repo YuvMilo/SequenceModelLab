@@ -59,7 +59,7 @@ class SMMModel(nn.Module):
                                                        self.parameterized_C,
                                                        self.parameterized_D,
                                                        device=self.device)
-        return A, B, C, D
+        return torch.clone(A), torch.clone(B), torch.clone(C), torch.clone(D)
 
     def get_num_hidden_state(self):
         return self.num_hidden_state
