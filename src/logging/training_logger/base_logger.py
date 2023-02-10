@@ -1,12 +1,12 @@
 from collections import defaultdict
 
 
-class BaseLogger:
+class BaseTrainingLogger:
 
     def __init__(self):
         self.history = defaultdict(list)
 
-    def log(self, loss, epoch_num, data_loader, model=None):
+    def log(self, loss, epoch_num, model):
         self.history["loss"].append(loss)
 
     def save(self):

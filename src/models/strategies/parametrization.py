@@ -52,7 +52,6 @@ class ContinuousSMMParametrizationStrategy(BaseSMMParametrizationStrategy):
         p_C = p_C.to(device)
         p_D = p_D.to(device)
 
-
         if self.discretize_parameters:
             p_A, p_B, p_C, p_D = self.discretization_strategy.discretize(
                 self.dt, p_A, p_B, p_C, p_D, device)
