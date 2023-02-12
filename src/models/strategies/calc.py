@@ -1,5 +1,5 @@
 from src.models.strategies.base import BaseSMMCalcStrategy
-from src.algorithms.ssm import recurrent_diag_ssm_calculation,\
+from src.algorithms.ssm_calc import recurrent_diag_ssm_calculation,\
     recurrent_ssm_calculation
 
 

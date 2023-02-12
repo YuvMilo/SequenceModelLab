@@ -1,6 +1,6 @@
 from src.models.strategies.base import BaseSSMDiscretizationStrategy
-from src.algorithms.ssm import bilinear_discretization,\
-    bilinear_diag_discretization
+from src.algorithms.discretization import bilinear_diag_discretization,\
+    bilinear_discretization
 
 
 class BilinearDiagSSMDiscretizationStrategy(BaseSSMDiscretizationStrategy):
