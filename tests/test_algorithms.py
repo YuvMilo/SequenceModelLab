@@ -1,8 +1,6 @@
-
-
 def test_recurrent_diag_ssm_calculation_1D_output():
     import torch
-    from src.algorithms.ssm import recurrent_diag_ssm_calculation
+    from src.algorithms.ssm_calc import recurrent_diag_ssm_calculation
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -20,7 +18,7 @@ def test_recurrent_diag_ssm_calculation_1D_output():
 
 def test_recurrent_diag_ssm_calculation():
     import torch
-    from src.algorithms.ssm import recurrent_diag_ssm_calculation
+    from src.algorithms.ssm_calc import recurrent_diag_ssm_calculation
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     x = torch.zeros([1, 1, 2]).to(device)
@@ -37,7 +35,7 @@ def test_recurrent_diag_ssm_calculation():
 
 def test_recurrent_diag_ssm_calculation():
     import torch
-    from src.algorithms.ssm import recurrent_ssm_calculation
+    from src.algorithms.ssm_calc import recurrent_ssm_calculation
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     x = torch.zeros([1, 2, 1]).to(device)
@@ -54,7 +52,7 @@ def test_recurrent_diag_ssm_calculation():
 
 def test_calc_kernel():
     import torch
-    from src.algorithms.ssm import calc_kernel
+    from src.algorithms.ssm_calc import calc_kernel
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     A = torch.Tensor([[0, 0], [1, 0]]).to(device)
@@ -66,9 +64,10 @@ def test_calc_kernel():
 
     assert torch.equal(ret, torch.Tensor([100, 101, 100]).to(device))
 
+
 def test_calc_kernel_diag():
     import torch
-    from src.algorithms.ssm import calc_kernel_diag
+    from src.algorithms.ssm_calc import calc_kernel_diag
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     A = torch.Tensor([0]).to(device)
@@ -81,4 +80,75 @@ def test_calc_kernel_diag():
     assert torch.equal(ret, torch.Tensor([101, 100, 100]).to(device))
 
 
+def test_get_rot_ssm_one_over_n():
+    import torch
+    import numpy as np
+    from src.algorithms.ssm_init1D import get_rot_ssm_one_over_n_init
 
+    A, _, _, _ = get_rot_ssm_one_over_n_init(num_hidden_state=6, radii=0.5)
+    eig = torch.linalg.eig(A).eigenvalues.numpy()
+
+    wanted_eig = np.array([-0.5,
+                           -0.5,
+                           0.5,
+                           0.5,
+                           0.5 * (np.cos(2 * np.pi / 3) + np.sin(2 * np.pi / 3) * 1j),
+                           0.5 * (np.cos(2 * np.pi / 3) - np.sin(2 * np.pi / 3) * 1j)])
+    wanted_eig = sorted(wanted_eig)
+    eig = sorted(eig)
+
+    assert np.allclose(wanted_eig, eig)
+
+
+def test_get_rot_ssm_equally_spaced():
+    import torch
+    import numpy as np
+    from src.algorithms.ssm_init1D import get_rot_ssm_equally_spaced_init
+
+    A, _, _, _ = get_rot_ssm_equally_spaced_init(num_hidden_state=6, radii=0.5,
+                                                 angle_shift=0)
+    eig = torch.linalg.eig(A).eigenvalues.numpy()
+
+    wanted_eig = np.array([
+        0.5,
+        0.5,
+        0.5j,
+        -0.5j,
+        -0.5,
+        -0.5
+    ])
+    wanted_eig = sorted(wanted_eig)
+    eig = sorted(eig)
+
+    assert np.allclose(wanted_eig, eig)
+
+
+def test_get_diag_ssm_plus_noise():
+    import torch
+    import numpy as np
+    from src.algorithms.ssm_init1D import get_diag_ssm_plus_noise_init
+
+    A, B, C, D = get_diag_ssm_plus_noise_init(num_hidden_state=2,
+                                              A_diag=0.9,
+                                              A_noise_std=0,
+                                              B_init_std=0,
+                                              C_init_std=0)
+
+    assert torch.norm(B) == 0
+    assert torch.norm(C) == 0
+    assert torch.norm(D) == 0
+    assert np.allclose(A, torch.eye(2)*0.9)
+
+
+def test_get_hippo_cont():
+    import torch
+    import numpy as np
+    from src.algorithms.ssm_init1D import get_hippo_cont_init
+
+    A, B, C, D = get_hippo_cont_init(num_hidden_state=2,
+                                     C_init_std=0)
+
+    assert torch.norm(C) == 0
+    assert torch.norm(D) == 0
+    assert np.allclose(B, [[1], [3**0.5]])
+    assert np.allclose(A[1, 0], -1*3**0.5)
