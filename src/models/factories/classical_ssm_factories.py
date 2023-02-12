@@ -2,7 +2,7 @@ import torch
 from typing import List, Callable, Any
 
 from src.algorithms.ssm_init1D import get_diag_ssm_plus_noise_init, \
-    get_rot_ssm_one_over_n_init, get_rot_ssm_equally_spaced_init, get_hippo_cont_init
+    get_rot_ssm_one_over_n_init, get_rot_ssm_equally_spaced_init, get_hippo_disc_init
 from src.models.ssm import SMMModel
 import src.models.strategies.storing as storing_strat
 import src.models.strategies.ssm_init as init_strat
@@ -70,7 +70,7 @@ def get_full_ssm_hippo1D(num_hidden_state: int,
                          dt: float = 0.01,
                          trainable_param_list: List[str] = ("A", "B", "C"),
                          device: torch.device = None) -> SMMModel:
-    init_func = lambda n: get_hippo_cont_init(num_hidden_state=n,
+    init_func = lambda n: get_hippo_disc_init(num_hidden_state=n,
                                               C_init_std=C_init_std,
                                               dt=dt)
 
