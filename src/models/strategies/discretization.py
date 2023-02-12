@@ -1,5 +1,5 @@
 from src.models.strategies.base import BaseSSMDiscretizationStrategy
-from src.utils import safe_complex_mm
+from src.algorithms.misc import safe_complex_mm
 import torch
 
 

@@ -1,7 +1,7 @@
 import torch
 
 from src.models.strategies.base import BaseSMMCalcStrategy
-from src.utils import safe_complex_mm
+from src.algorithms.misc import safe_complex_mm
 
 
 class RecurrentDiagSMMCalcStrategy(BaseSMMCalcStrategy):
