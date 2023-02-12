@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 
 def safe_complex_mm(m1: torch.Tensor, m2: torch.Tensor) -> torch.Tensor:
@@ -12,3 +13,7 @@ def safe_complex_mm(m1: torch.Tensor, m2: torch.Tensor) -> torch.Tensor:
         m1 = m1.type(torch.cfloat)
         m2 = m2.type(torch.cfloat)
         return torch.mm(m1, m2)
+
+
+def polar_to_complex(radii, angles_radians):
+    return radii * np.exp(1j * angles_radians)

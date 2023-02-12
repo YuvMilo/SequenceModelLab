@@ -18,7 +18,7 @@ def train_smm_over_white_noise_lag(model: SMMModel, lag: int,
                                    plot: bool = False,
                                    min_cut: int = 1000,
                                    early_stop: bool = True,
-                                   show_tqdm=True):
+                                   show_tqdm: bool = True):
 
     if device is not None:
         model.change_device(device)
@@ -97,7 +97,7 @@ def train_smm_over_white_noise_lag_multiprocess(
         plot: bool = False,
         min_cut: int = 1000,
         early_stop: bool = True,
-        show_tqdm=False,
+        show_tqdm: bool = False,
         progress_bar_actor: ProgressBarActor = None):
 
     if device is not None:
