@@ -42,6 +42,13 @@ class SMMModel(nn.Module):
         out = self.ssm_calc_strategy.calc(x, A, B, C, D, self.device)
         return out
 
+    def change_device(self, device):
+        self.device = device
+        self.parameterized_A = self.parameterized_A.to(device),
+        self.parameterized_B = self.parameterized_B.to(device),
+        self.parameterized_C = self.parameterized_C.to(device),
+        self.parameterized_D = self.parameterized_D.to(device),
+
     def get_kernel(self, ker_len):
         if self.input_dim != 1 or self.output_dim != 1:
             raise NotImplementedError("get_kernel are only implemented for 1D to 1D")
