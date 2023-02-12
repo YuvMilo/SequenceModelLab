@@ -22,6 +22,21 @@ def test_BaseTrainingLog_logged_training_entities():
     assert set(log.logged_training_entities) == {"A", "B"}
 
 
+def test_BaseTrainingLog_saving_trained_params():
+    from src.logging.training_logs.base_log import BaseTrainingLog
+
+    d = {"A": 5}
+    log = BaseTrainingLog(d)
+    d["A"] = 6
+
+    log.save("tmp")
+    log = BaseTrainingLog()
+    log.load("tmp")
+    os.remove("tmp")  # TODO - There's probably a safer way to deal with tmp files.
+
+    assert log.running_params["A"] == 5
+
+
 def test_BaseTrainingLog_get_logged_entity_history():
     from src.logging.training_logs.base_log import BaseTrainingLog
 
@@ -137,7 +152,8 @@ def test_SSMTrainingLogger():
 
     param_storing_freq = 2
     saving_freq = 10
-    logger = SSMTrainingLogger(saving_path="tmp" , param_storing_freq=param_storing_freq)
+    logger = SSMTrainingLogger(saving_path="tmp", param_storing_freq=param_storing_freq,
+                               running_params={"lr": 0.001})
 
     # TODO - Use the output of a factory instead.
     dummy_SSM_model = SMMModel(
@@ -177,3 +193,4 @@ def test_SSMTrainingLogger():
 
     # Making
     assert np.max(logger.training_log.get_logged_entity_history(entity_name="A").epochs) % saving_freq == 0
+    assert logger.training_log.running_params["lr"] == 0.001

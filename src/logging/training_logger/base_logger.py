@@ -1,4 +1,5 @@
 from collections import defaultdict
+import torch
 
 
 class BaseTrainingLogger:
@@ -6,14 +7,14 @@ class BaseTrainingLogger:
     def __init__(self):
         self.history = defaultdict(list)
 
-    def log(self, loss, epoch_num, model):
+    def log(self, loss: float, epoch_num: int, model: torch.nn.Module) -> None:
         self.history["loss"].append(loss)
 
-    def save(self):
+    def save(self) -> None:
         pass
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __del__(self):
         self.save()

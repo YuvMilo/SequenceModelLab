@@ -16,7 +16,7 @@ class EntityTrainingHistory:
         return list(np.sort(self._epochs))
 
     @property
-    def entities(self) -> List[int]:
+    def entities(self) -> List[Any]:
         return [self._entities[i] for i in np.argsort(self._epochs)]
 
     def __getitem__(self, key: int) -> Any:
@@ -33,14 +33,19 @@ class EntityTrainingHistory:
 
 class BaseTrainingLog:
 
-    def __init__(self):
+    def __init__(self, running_params: dict = None):
         self.end_results = {}
         self.training_history_entities = defaultdict(EntityTrainingHistory)
+        if running_params is None:
+            self._running_params = {}
+        else:
+            self._running_params = running_params.copy()
 
     def save(self, file_path: str) -> None:
         saving_dict = {
             "end_results": self.end_results,
-            "training_history_entities": self.training_history_entities
+            "training_history_entities": self.training_history_entities,
+            "running_params": self._running_params
         }
 
         with bz2.BZ2File(file_path, "wb") as f:
@@ -51,6 +56,7 @@ class BaseTrainingLog:
             saving_dict = pickle.load(f)
         self.end_results = saving_dict["end_results"]
         self.training_history_entities = saving_dict["training_history_entities"]
+        self._running_params = saving_dict["running_params"]
 
     def log_training_entity(self, entity_name: str, epoch: int, value: Any) -> None:
         self.training_history_entities[entity_name].add_entity(epoch, value)
@@ -86,6 +92,10 @@ class BaseTrainingLog:
     @property
     def logged_end_results(self) -> List[str]:
         return [key for key in self.end_results]
+
+    @property
+    def running_params(self) -> dict:
+        return self._running_params
 
     def __bool__(self) -> bool:
         if len(self.end_results) != 0:
