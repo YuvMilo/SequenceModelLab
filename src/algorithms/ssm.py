@@ -4,7 +4,7 @@ from typing import List
 from src.algorithms.misc import safe_complex_mm
 
 
-#TODO - Write test for this
+# TODO - Write test for this
 def bilinear_diag_discretization(dt: float, A: torch.Tensor,
                                  B: torch.Tensor,
                                  C: torch.Tensor,
@@ -15,7 +15,7 @@ def bilinear_diag_discretization(dt: float, A: torch.Tensor,
     return A, B, C, D
 
 
-#TODO - Write test for this
+# TODO - Write test for this
 def bilinear_discretization(dt: float, A: torch.Tensor,
                             B: torch.Tensor,
                             C: torch.Tensor,
@@ -31,7 +31,7 @@ def recurrent_diag_ssm_calculation(x: torch.Tensor,
                                    A: torch.Tensor,
                                    B: torch.Tensor,
                                    C: torch.Tensor,
-                                   D: torch.Tensor):
+                                   D: torch.Tensor) -> torch.Tensor:
     """
     x is of shape B L in_D
     A is of shape H
@@ -70,7 +70,7 @@ def recurrent_ssm_calculation(x: torch.Tensor,
                               A: torch.Tensor,
                               B: torch.Tensor,
                               C: torch.Tensor,
-                              D: torch.Tensor):
+                              D: torch.Tensor) -> torch.Tensor:
     """
     x is of shape B L in_D
     A is of shape H, H
@@ -108,7 +108,7 @@ def calc_kernel(A: torch.Tensor,
                 B: torch.Tensor,
                 C: torch.Tensor,
                 D: torch.Tensor,
-                ker_len: int):
+                ker_len: int) -> torch.Tensor:
 
     x = torch.zeros([1, ker_len, 1]).to(A.device)
     x[0, 0, 0] = 1
@@ -121,7 +121,7 @@ def calc_kernel_diag(A: torch.Tensor,
                      B: torch.Tensor,
                      C: torch.Tensor,
                      D: torch.Tensor,
-                     ker_len: int):
+                     ker_len: int) -> torch.Tensor:
     x = torch.zeros([1, ker_len, 1]).to(A.device)
     x[0, 0, 0] = 1
     ker = recurrent_diag_ssm_calculation(x, A, B, C, D)

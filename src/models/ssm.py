@@ -13,6 +13,7 @@ class SMMModel(nn.Module):
         self.num_hidden_state = num_hidden_state
         self.input_dim = input_dim
         self.output_dim = output_dim
+
         # TODO - This should be a "running context"
         # Should be refactored to be a class
         self.device = device
