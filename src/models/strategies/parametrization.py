@@ -54,7 +54,7 @@ class ContinuousSMMParametrizationStrategy(BaseSMMParametrizationStrategy):
 
         if self.discretize_parameters:
             p_A, p_B, p_C, p_D = self.discretization_strategy.discretize(
-                self.dt, p_A, p_B, p_C, p_D, device)
+                self.dt, p_A, p_B, p_C, p_D)
 
         return self.ssm_storing_strategy.store(p_A, p_B, p_C, p_D)
 
@@ -63,6 +63,6 @@ class ContinuousSMMParametrizationStrategy(BaseSMMParametrizationStrategy):
 
         if not self.discretize_parameters:
             p_A, p_B, p_C, p_D = self.discretization_strategy.discretize(
-                self.dt, p_A, p_B, p_C, p_D, device)
+                self.dt, p_A, p_B, p_C, p_D)
 
         return p_A, p_B, p_C, p_D

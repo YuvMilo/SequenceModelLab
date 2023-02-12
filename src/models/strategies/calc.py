@@ -1,14 +1,13 @@
-import torch
-
 from src.models.strategies.base import BaseSMMCalcStrategy
-from src.algorithms.misc import safe_complex_mm
+from src.algorithms.ssm import recurrent_diag_ssm_calculation,\
+    recurrent_ssm_calculation
 
 
 class RecurrentDiagSMMCalcStrategy(BaseSMMCalcStrategy):
     def __init__(self):
         super().__init__()
 
-    def calc(self, x, A, B, C, D, device):
+    def calc(self, x, A, B, C, D):
         """
         x is of shape B L in_D
         A is of shape H
@@ -17,37 +16,14 @@ class RecurrentDiagSMMCalcStrategy(BaseSMMCalcStrategy):
         D is of shape out_D or 1 if output is 1D
         """
 
-        batch_size, sequence_length, input_size = x.size()
-        h = torch.zeros(A.shape[0], batch_size).to(device)
-
-        A = A.view(-1, 1)
-        D = D.view(-1, 1)
-
-        if B.dim() == 1:
-            B = B.view(-1, 1)
-
-        if C.dim() == 1:
-            C = C.view(1, -1)
-
-        out = []
-        for t in range(sequence_length):
-            x_t = x[:, t, :]  # B, D
-            x_t = x_t.transpose(0, 1)  # input_D, B
-            h = safe_complex_mm(B, x_t) + h * A  # H, B
-            cur_out = safe_complex_mm(C, h) + D  # output_D, B
-            out.append(cur_out.real)
-
-        out = torch.stack(out, dim=0)  # L, output_D ,B
-        out = torch.permute(out, [2, 0, 1])  # B, L ,output_D
-
-        return out
+        return recurrent_diag_ssm_calculation(x, A, B, C, D)
 
 
 class RecurrentSMMCalcStrategy(BaseSMMCalcStrategy):
     def __init__(self):
         super().__init__()
 
-    def calc(self, x, A, B, C, D, device):
+    def calc(self, x, A, B, C, D):
         """
         x is of shape B L in_D
         A is of shape H, H
@@ -56,26 +32,4 @@ class RecurrentSMMCalcStrategy(BaseSMMCalcStrategy):
         D is of shape out_D or 1 if output is 1D
         """
 
-        batch_size, sequence_length, input_size = x.size()
-        h = torch.zeros(A.shape[0], batch_size).to(device)
-
-        D = D.view(-1, 1)
-
-        if B.dim() == 1:
-            B = B.view(-1, 1)
-
-        if C.dim() == 1:
-            C = C.view(1, -1)
-
-        out = []
-        for t in range(sequence_length):
-            x_t = x[:, t, :]  # B, D
-            x_t = x_t.transpose(0, 1)  # input_D, B
-            h = safe_complex_mm(B, x_t) + safe_complex_mm(A, h)  # H, B
-            cur_out = safe_complex_mm(C, h) + D  # output_D, B
-            out.append(cur_out.real)
-
-        out = torch.stack(out, dim=0)  # L, output_D ,B
-        out = torch.permute(out, [2, 0, 1])  # B, L ,output_D
-
-        return out
+        return recurrent_ssm_calculation(x, A, B, C, D)

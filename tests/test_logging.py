@@ -98,6 +98,7 @@ def test_BaseTrainingLog_get_end_result():
 
     assert log.get_end_result("A") == 1
 
+
 def test_BaseTrainingLog_bool():
     from src.logging.training_logs.base_log import BaseTrainingLog
 

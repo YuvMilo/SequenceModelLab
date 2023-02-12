@@ -39,7 +39,7 @@ class SMMModel(nn.Module):
                                                        self.parameterized_D,
                                                        self.device)
 
-        out = self.ssm_calc_strategy.calc(x, A, B, C, D, self.device)
+        out = self.ssm_calc_strategy.calc(x, A, B, C, D)
         return out
 
     def change_device(self, device):
