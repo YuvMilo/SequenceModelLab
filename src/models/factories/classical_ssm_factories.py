@@ -82,8 +82,8 @@ def get_full_ssm_hippo1D(num_hidden_state: int,
 
 def get_rot_ssm_equally_spaced(num_hidden_state: int,
                                radii: float = 0.99,
-                               B_init_std: float = 1e-1,
-                               C_init_std: float = 1e-1,
+                               B_init_std: float = 2e-1,
+                               C_init_std: float = 2e-1,
                                trainable_param_list: List[str] = ("A", "B", "C"),
                                device: torch.device = None) -> SMMModel:
     init_func = lambda n: get_rot_ssm_equally_spaced_init(num_hidden_state=n,
