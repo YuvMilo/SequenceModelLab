@@ -13,6 +13,7 @@ class SMMModel(nn.Module):
         self.num_hidden_state = num_hidden_state
         self.input_dim = input_dim
         self.output_dim = output_dim
+        self.trainable_param_list = trainable_param_list
 
         # TODO - This should be a "running context"
         # Should be refactored to be a class
@@ -25,13 +26,13 @@ class SMMModel(nn.Module):
         )
 
         self.parameterized_A = nn.Parameter(p_A.to(device),
-                                            requires_grad="A" in trainable_param_list)
+                                            requires_grad="A" in self.trainable_param_list)
         self.parameterized_B = nn.Parameter(p_B.to(device),
-                                            requires_grad="B" in trainable_param_list)
+                                            requires_grad="B" in self.trainable_param_list)
         self.parameterized_C = nn.Parameter(p_C.to(device),
-                                            requires_grad="C" in trainable_param_list)
+                                            requires_grad="C" in self.trainable_param_list)
         self.parameterized_D = nn.Parameter(p_D.to(device),
-                                            requires_grad="D" in trainable_param_list)
+                                            requires_grad="D" in self.trainable_param_list)
 
     def forward(self, x):
         A, B, C, D = self.ssm_param_strategy.get_param(self.parameterized_A,
@@ -43,12 +44,9 @@ class SMMModel(nn.Module):
         out = self.ssm_calc_strategy.calc(x, A, B, C, D)
         return out
 
-    def change_device(self, device):
+    def to(self, device):
         self.device = device
-        self.parameterized_A = self.parameterized_A.to(device),
-        self.parameterized_B = self.parameterized_B.to(device),
-        self.parameterized_C = self.parameterized_C.to(device),
-        self.parameterized_D = self.parameterized_D.to(device),
+        return super()
 
     def get_kernel(self, ker_len):
         if self.input_dim != 1 or self.output_dim != 1:

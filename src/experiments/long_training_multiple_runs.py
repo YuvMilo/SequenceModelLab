@@ -47,7 +47,7 @@ def var_fssm(progress_bar_actor):
         else:
             raise NotImplementedError()
 
-        return os.path.join("../..", "results", "variance_mult",
+        return os.path.join("..", "results", "variance_mult",
                             "ssm_h{hidden}_i{i}_l{lag}_lr{lr}_n{noise}_d{diag_init}_b{BC_std}_o{opt}".format(
                                 lag=lag,
                                 lr=lr,
@@ -62,7 +62,6 @@ def var_fssm(progress_bar_actor):
     tasks = []
     for res in top_fssm_res:
         opt = opt_str_to_opt[res["opt"]]
-        lag = int(res["lag"])
         lr = float(res["lr"])
         noise = float(res["noise"])
         diags_init = float(res["diag_init"])
@@ -83,15 +82,14 @@ def var_fssm(progress_bar_actor):
 
             logger = SSMTrainingLogger(saving_path=saving_path,
                                        running_params=res)
-            optimizer = opt(model.parameters(),
-                            lr=lr)
             tasks.append(train_smm_over_white_noise_lag_multiprocess.remote(
                 model=model,
                 lag=lag,
                 seq_len=seq_len,
                 logger=logger,
                 num_epochs=epochs,
-                optimizer=optimizer,
+                optimizer=opt,
+                lr=lr,
                 early_stop=False,
                 min_cut=epochs,
                 progress_bar_actor=progress_bar_actor
@@ -120,7 +118,7 @@ def var_hippo(progress_bar_actor):
         else:
             raise NotImplementedError()
 
-        return os.path.join("../..", "results", "variance_mult",
+        return os.path.join("..", "results", "variance_mult",
                             "hippo_h{hidden}_i{i}_l{lag}_lr{lr}_dt{dt}_o{opt}".format(
                                 lag=lag,
                                 lr=lr,
@@ -133,7 +131,6 @@ def var_hippo(progress_bar_actor):
     tasks = []
     for res in top_hippo_res:
         opt = opt_str_to_opt[res["opt"]]
-        lag = int(res["lag"])
         lr = float(res["lr"])
         dt = float(res["dt"])
 
@@ -146,15 +143,14 @@ def var_hippo(progress_bar_actor):
 
             logger = SSMTrainingLogger(saving_path=saving_path,
                                        running_params=res)
-            optimizer = opt(model.parameters(),
-                            lr=lr)
             tasks.append(train_smm_over_white_noise_lag_multiprocess.remote(
                 model=model,
                 lag=lag,
                 seq_len=seq_len,
                 logger=logger,
                 num_epochs=epochs,
-                optimizer=optimizer,
+                optimizer=opt,
+                lr=lr,
                 early_stop=False,
                 min_cut=epochs,
                 progress_bar_actor=progress_bar_actor
@@ -164,9 +160,9 @@ def var_hippo(progress_bar_actor):
 
 top_hippo_no_res = [
     {'no': 'a', 'hidden': '64', 'lag': '60', 'lr': '0.1', 'dt': '0.1',
-     'opt': 'adam', 'model_name': 'hippo_no'},
+     'opt': 'adam', 'model_name': 'hippo_no_a'},
     {'no': 'ac', 'hidden': '64', 'lag': '60', 'lr': '0.001', 'dt': '0.1',
-     'opt': 'adam', 'model_name': 'hippo_no'},
+     'opt': 'adam', 'model_name': 'hippo_no_ac'},
 ]
 
 
@@ -179,7 +175,7 @@ def var_hippo_no_a(progress_bar_actor):
         else:
             raise NotImplementedError()
 
-        return os.path.join("../..", "results", "variance_mult",
+        return os.path.join("..", "results", "variance_mult",
                             "hippo_no{no}_h{hidden}_i{i}_l{lag}_lr{lr}_dt{dt}_o{opt}".format(
                                 lag=lag,
                                 lr=lr,
@@ -193,7 +189,6 @@ def var_hippo_no_a(progress_bar_actor):
     tasks = []
     for res in top_hippo_no_res:
         opt = opt_str_to_opt[res["opt"]]
-        lag = int(res["lag"])
         lr = float(res["lr"])
         dt = float(res["dt"])
         no = res["no"]
@@ -224,7 +219,8 @@ def var_hippo_no_a(progress_bar_actor):
                 seq_len=seq_len,
                 logger=logger,
                 num_epochs=epochs,
-                optimizer=optimizer,
+                optimizer=opt,
+                lr=lr,
                 early_stop=False,
                 min_cut=epochs,
                 progress_bar_actor=progress_bar_actor
@@ -249,7 +245,7 @@ def var_rot(progress_bar_actor):
         else:
             raise NotImplementedError()
 
-        return os.path.join("../..", "results", "variance_mult",
+        return os.path.join("..", "results", "variance_mult",
                             "rot_h{hidden}_{rot_type}_i{i}_l{lag}_lr{lr}_o{opt}".format(
                                 lag=lag,
                                 lr=lr,
@@ -262,7 +258,6 @@ def var_rot(progress_bar_actor):
     tasks = []
     for res in top_rot_res:
         opt = opt_str_to_opt[res["opt"]]
-        lag = int(res["lag"])
         lr = float(res["lr"])
         rot_type = res["rot_type"]
         for i in range(NUM_TIMES):
@@ -280,15 +275,14 @@ def var_rot(progress_bar_actor):
 
             logger = SSMTrainingLogger(saving_path=saving_path,
                                        running_params=res)
-            optimizer = opt(model.parameters(),
-                            lr=lr)
             tasks.append(train_smm_over_white_noise_lag_multiprocess.remote(
                 model=model,
                 lag=lag,
                 seq_len=seq_len,
                 logger=logger,
                 num_epochs=epochs,
-                optimizer=optimizer,
+                optimizer=opt,
+                lr=lr,
                 early_stop=False,
                 min_cut=epochs,
                 progress_bar_actor=progress_bar_actor
@@ -309,3 +303,8 @@ def run_exp():
 
     pb.set_total(len(tasks))
     pb.print_until_done()
+
+
+
+if __name__ == "__main__":
+    run_exp()

@@ -8,7 +8,7 @@ from src.logging.training_logger.base_logger import BaseTrainingLogger
 
 class SSMTrainingLogger(BaseTrainingLogger):
 
-    def __init__(self, saving_path: str, saving_freq: int = 10000,
+    def __init__(self, saving_path: str = None, saving_freq: int = 10000,
                  param_storing_freq: int = 1,
                  running_params: dict = None):
         self.saving_freq = saving_freq
@@ -27,16 +27,19 @@ class SSMTrainingLogger(BaseTrainingLogger):
             self._training_log.log_training_entity(entity_name="A", epoch=epoch_num,
                                                    value=A.cpu().detach().numpy())
             self._training_log.log_training_entity(entity_name="B", epoch=epoch_num,
-                                                   value=A.cpu().detach().numpy())
+                                                   value=B.cpu().detach().numpy())
             self._training_log.log_training_entity(entity_name="C", epoch=epoch_num,
-                                                   value=A.cpu().detach().numpy())
+                                                   value=C.cpu().detach().numpy().copy())
             self._training_log.log_training_entity(entity_name="D", epoch=epoch_num,
-                                                   value=A.cpu().detach().numpy())
+                                                   value=D.cpu().detach().numpy())
 
         if epoch_num % self.saving_freq == 0:
             self.save()
 
     def save(self) -> None:
+        if self.saving_path is None:
+            return
+
         save_dir = os.path.dirname(self.saving_path)
         if save_dir != "" and not os.path.exists(save_dir):
             os.makedirs(save_dir)

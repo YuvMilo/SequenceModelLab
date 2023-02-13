@@ -6,20 +6,19 @@ import ray
 
 from src.loss_function.loss_function_over_model.ssm import l2_loss_with_random_noise
 from src.models.ssm import SMMModel
-from src.logging.training_logger import ssm_logger
+from src.logging.training_logger.ssm_logger import SSMTrainingLogger
 
 from src.multiprocessing.utils import ProgressBarActor
 
 
 def train_smm_over_white_noise_lag(model: SMMModel, lag: int,
                                    seq_len: int, optimizer: torch.optim.Optimizer,
-                                   num_epochs: int, logger: ssm_logger,
+                                   num_epochs: int, logger: SSMTrainingLogger,
                                    device: torch.device = None,
                                    plot: bool = False,
                                    min_cut: int = 1000,
                                    early_stop: bool = True,
                                    show_tqdm: bool = True):
-
     if device is not None:
         model.change_device(device)
 
@@ -57,26 +56,12 @@ def train_smm_over_white_noise_lag(model: SMMModel, lag: int,
         # TODO this should be a early stopping strategy
         all_loss = np.array(logger.get_loss_hist())
 
-        if all_loss[-1] > 10**6:
+        if all_loss[-1] > 10 ** 6:
             logger.save()
             break
 
         if (len(all_loss) > min_cut) or (np.min(all_loss) < 0.3):
-            arg_min_loss = np.argmin(all_loss) + 1
-            ago = len(all_loss) - arg_min_loss
-            if early_stop and ago > 200:
-                logger.save()
-                break
-
-            # if ago > 2000:
-            #     logger.save()
-            #     break
             no_change_time = 200
-            # if early_stop:
-            #     no_change_time = 200
-            # else:
-            #     no_change_time = 2000
-
             if early_stop and len(all_loss) > no_change_time:
                 current_min_loss = np.min(all_loss[-no_change_time:])
                 pre_min_loss = np.min(all_loss[:-no_change_time])
@@ -87,21 +72,22 @@ def train_smm_over_white_noise_lag(model: SMMModel, lag: int,
     logger.save()
 
 
-@ray.remote(num_gpus=0.25)
+@ray.remote(num_gpus=0.25 if torch.cuda.is_available() else 0)
 def train_smm_over_white_noise_lag_multiprocess(
         model: SMMModel, lag: int,
         seq_len: int,
         optimizer: torch.optim.Optimizer,
-        num_epochs: int, logger: ssm_logger,
-        device: torch.device = None,
+        lr: float,
+        num_epochs: int, logger: SSMTrainingLogger,
         plot: bool = False,
         min_cut: int = 1000,
         early_stop: bool = True,
         show_tqdm: bool = False,
         progress_bar_actor: ProgressBarActor = None):
 
-    if device is not None:
-        model.change_device(device)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
+    optimizer = optimizer(model.parameters(), lr=lr)
 
     # Loop over the epochs
     for epoch in tqdm(range(num_epochs), leave=True, disable=not show_tqdm):
