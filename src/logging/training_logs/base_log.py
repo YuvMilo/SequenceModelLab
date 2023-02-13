@@ -2,7 +2,8 @@ from typing import Any, List, Callable
 import numpy as np
 from collections import defaultdict
 import pickle
-import bz2
+import lz4.frame
+from src.utils.imutable_dict import ImmutableDict
 
 
 class EntityTrainingHistory:
@@ -10,25 +11,40 @@ class EntityTrainingHistory:
     def __init__(self):
         self._epochs = []
         self._entities = []
+        self.sorted = True
 
     @property
     def epochs(self) -> List[int]:
-        return list(np.sort(self._epochs))
+        if not self.sorted:
+            self.sort()
+        return self._epochs.copy()
 
     @property
     def entities(self) -> List[Any]:
-        return [self._entities[i] for i in np.argsort(self._epochs)]
+        if not self.sorted:
+            self.sort()
+        return self._entities.copy()
 
     def __getitem__(self, key: int) -> Any:
-        indexes = np.where(np.array(self._epochs) == key)[0]
-        if len(indexes) != 1:
+        if not self.sorted:
+            self.sort()
+
+        i1 = np.searchsorted(self._epochs, key, 'left')
+        i2 = np.searchsorted(self._epochs, key, 'right')
+        if np.any((i2 - i1) != 1):
             return None
         else:
-            return self._entities[indexes[0]]
+            return np.array(self._entities)[i1]
 
     def add_entity(self, epoch, entity):
         self._epochs.append(epoch)
         self._entities.append(entity)
+        self.sorted = False
+
+    def sort(self):
+        self._entities = [self._entities[i] for i in np.argsort(self._epochs)]
+        self._epochs = list(np.sort(self._epochs))
+        self.sorted = True
 
 
 class BaseTrainingLog:
@@ -48,11 +64,11 @@ class BaseTrainingLog:
             "running_params": self._running_params
         }
 
-        with bz2.BZ2File(file_path, "wb") as f:
+        with lz4.frame.open(file_path, "wb") as f:
             pickle.dump(saving_dict, f)
 
     def load(self, file_path: str) -> None:
-        with bz2.BZ2File(file_path, "rb") as f:
+        with lz4.frame.open(file_path, "rb") as f:
             saving_dict = pickle.load(f)
         self.end_results = saving_dict["end_results"]
         self.training_history_entities = saving_dict["training_history_entities"]
@@ -64,20 +80,48 @@ class BaseTrainingLog:
     def log_end_result(self, end_result_name: str, value: Any) -> None:
         self.end_results[end_result_name] = value
 
-    def add_entity_history_by_augmentation(self, entity_name: str, parameter: List[str],
+    def add_entity_history_by_augmentation(self, entity_name: str,
+                                           parameters: List[str],
                                            augmentation_func: Callable[..., Any]):
-        epochs_with_params = set(self.training_history_entities[parameter[0]].epochs)
-        for param in parameter[1:]:
+        epochs_with_params = set(self.training_history_entities[parameters[0]].epochs)
+        for param in parameters[1:]:
             cur_epochs = set(self.training_history_entities[param].epochs)
             epochs_with_params = epochs_with_params.intersection(cur_epochs)
+        epochs_with_params = sorted(list(epochs_with_params))
 
-        for epoch in epochs_with_params:
-            cur_params = [self.training_history_entities[param][epoch]
-                          for param in parameter]
+        # This is quicker then searching for training_history_entities[param][epoch]
+        # foreach epoch
+        params_values = []
+        for param in parameters:
+            cur_param_value = self.training_history_entities[param][epochs_with_params]
+            params_values.append(cur_param_value)
+
+        for i, epoch in enumerate(epochs_with_params):
+            cur_params = [params_values[param_idx][i]
+                          for param_idx in range(len(parameters))]
             self.training_history_entities[entity_name].add_entity(
                 epoch=epoch,
                 entity=augmentation_func(*cur_params)
             )
+
+    def add_entity_end_result_by_augmentation(self, entity_name: str,
+                                              parameters: List[str],
+                                              augmentation_func: Callable[..., Any]):
+
+        epochs_with_params = set(self.training_history_entities[parameters[0]].epochs)
+        for param in parameters[1:]:
+            cur_epochs = set(self.training_history_entities[param].epochs)
+            epochs_with_params = epochs_with_params.intersection(cur_epochs)
+        epochs_with_params = sorted(list(epochs_with_params))
+
+        params_values = []
+        for param in parameters:
+            cur_param_value = self.training_history_entities[param][epochs_with_params]
+            params_values.append(cur_param_value)
+
+        self.end_results[entity_name] = augmentation_func(
+            *([epochs_with_params] + params_values)
+        )
 
     def get_logged_entity_history(self, entity_name: str) -> EntityTrainingHistory:
         return self.training_history_entities[entity_name]
@@ -94,12 +138,11 @@ class BaseTrainingLog:
         return [key for key in self.end_results]
 
     @property
-    def running_params(self) -> dict:
-        return self._running_params
+    def running_params(self) -> ImmutableDict:
+        return ImmutableDict(self._running_params)
 
     def __bool__(self) -> bool:
-        if len(self.end_results) != 0:
-            return True
-        if len(self.training_history_entities) != 0:
-            return True
+        for param in self.logged_training_entities:
+            if len(self.get_logged_entity_history(param).entities) > 1:
+                return True
         return False

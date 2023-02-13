@@ -32,6 +32,7 @@ scipy = "^1.9.3"
 colorama = "^0.4.6"
 jupyter = "^1.0.0"
 ray = "^2.2.0"
+lz4 = "^4.3.2"
 
 [build-system]
 requires = ["poetry-core"]

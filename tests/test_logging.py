@@ -52,7 +52,7 @@ def test_BaseTrainingLog_get_logged_entity_history():
     assert entity_history.epochs == [0, 2, 5]
 
 
-def test_BaseTrainingLog_augmentation():
+def test_BaseTrainingLog_history_augmentation():
     from src.logging.training_logs.base_log import BaseTrainingLog
 
     log = BaseTrainingLog()
@@ -67,7 +67,7 @@ def test_BaseTrainingLog_augmentation():
         return A+B
 
     log.add_entity_history_by_augmentation(entity_name="C",
-                                           parameter=["A", "B"],
+                                           parameters=["A", "B"],
                                            augmentation_func=augmentation_func)
 
     entity_history = log.get_logged_entity_history(entity_name="C")
@@ -75,6 +75,31 @@ def test_BaseTrainingLog_augmentation():
     # Entity should be logged only where the two parameters are available
     assert entity_history.epochs == [2, 5]
     assert entity_history.entities == [0, 1]
+
+
+def test_BaseTrainingLog_end_result_augmentation():
+    import numpy as np
+    from src.logging.training_logs.base_log import BaseTrainingLog
+
+    log = BaseTrainingLog()
+    log.log_training_entity("A", 1, 1)
+    log.log_training_entity("A", 2, 2)
+    log.log_training_entity("A", 3, 3)
+    log.log_training_entity("B", 2, -2)
+    log.log_training_entity("B", 3, -3)
+    log.log_training_entity("B", 4, -4)
+
+    def augmentation_func(epochs, As, Bs) -> int:
+        return min(np.min(As), np.min(Bs))
+
+    log.add_entity_end_result_by_augmentation(entity_name="min",
+                                              parameters=["A", "B"],
+                                              augmentation_func=augmentation_func)
+
+    end_result = log.get_end_result(end_result_name="min")
+
+    # Entity should be calculated over when all the params are avalable
+    assert end_result == -3
 
 
 def test_BaseTrainingLog_logged_end_results():
@@ -103,12 +128,13 @@ def test_BaseTrainingLog_bool():
     from src.logging.training_logs.base_log import BaseTrainingLog
 
     log = BaseTrainingLog()
-    log.log_end_result("A", 0)
+    log.log_training_entity("A", 1, 0)
+    log.log_training_entity("A", 2, 1)
     assert log
 
     log = BaseTrainingLog()
     log.log_training_entity("A", 1, 0)
-    assert log
+    assert not log
 
     log = BaseTrainingLog()
     assert not log
@@ -188,10 +214,11 @@ def test_SSMTrainingLogger():
     assert logger.training_log.get_logged_entity_history(entity_name="A").epochs == should_log_param_epochs
 
     logger.save()
+
     log = BaseTrainingLog()
     log.load("tmp")
     os.remove("tmp")  # TODO - There's probably a safer way to deal with tmp files.
 
     # Making
-    assert np.max(logger.training_log.get_logged_entity_history(entity_name="A").epochs) % saving_freq == 0
-    assert logger.training_log.running_params["lr"] == 0.001
+    assert np.max(log.get_logged_entity_history(entity_name="A").epochs) % saving_freq == 0
+    assert log.running_params["lr"] == 0.001
