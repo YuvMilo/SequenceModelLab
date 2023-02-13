@@ -13,9 +13,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 hidden_size = 64
 lag = 63
 seq_len = hidden_size * 3
-epochs = 40000
+epochs = 30000
 
-NUM_TIMES = 10
+NUM_TIMES = 20
 
 opt_str_to_opt = {
     'adam': torch.optim.Adam,
