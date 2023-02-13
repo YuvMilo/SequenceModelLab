@@ -26,13 +26,17 @@ class SMMModel(nn.Module):
         )
 
         self.parameterized_A = nn.Parameter(p_A.to(device),
-                                            requires_grad="A" in self.trainable_param_list)
+                                            requires_grad="A" in
+                                                          self.trainable_param_list)
         self.parameterized_B = nn.Parameter(p_B.to(device),
-                                            requires_grad="B" in self.trainable_param_list)
+                                            requires_grad="B" in
+                                                          self.trainable_param_list)
         self.parameterized_C = nn.Parameter(p_C.to(device),
-                                            requires_grad="C" in self.trainable_param_list)
+                                            requires_grad="C" in
+                                                          self.trainable_param_list)
         self.parameterized_D = nn.Parameter(p_D.to(device),
-                                            requires_grad="D" in self.trainable_param_list)
+                                            requires_grad="D" in
+                                                          self.trainable_param_list)
 
     def forward(self, x):
         A, B, C, D = self.ssm_param_strategy.get_param(self.parameterized_A,

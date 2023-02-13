@@ -11,7 +11,7 @@ from src.multiprocessing.utils import ProgressBar
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 hidden_size = 64
-lags = [63]
+lag = 63
 seq_len = hidden_size * 3
 epochs = 40000
 
@@ -211,8 +211,6 @@ def var_hippo_no_a(progress_bar_actor):
 
             logger = SSMTrainingLogger(saving_path=saving_path,
                                        running_params=res)
-            optimizer = opt(model.parameters(),
-                            lr=lr)
             tasks.append(train_smm_over_white_noise_lag_multiprocess.remote(
                 model=model,
                 lag=lag,
@@ -303,7 +301,6 @@ def run_exp():
 
     pb.set_total(len(tasks))
     pb.print_until_done()
-
 
 
 if __name__ == "__main__":
