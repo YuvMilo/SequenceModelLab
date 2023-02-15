@@ -19,6 +19,7 @@ epochs = 40000
 
 NUM_TIMES = 20
 
+
 def get_tasks_fssm(progress_bar_actor,
                    log_param_freq: int = 1):
     tasks = []
