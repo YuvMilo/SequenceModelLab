@@ -82,7 +82,14 @@ class BaseTrainingLog:
 
     def add_entity_history_by_augmentation(self, entity_name: str,
                                            parameters: List[str],
-                                           augmentation_func: Callable[..., Any]):
+                                           augmentation_func: Callable[..., Any],
+                                           overwrite: bool = False):
+        if entity_name in self.training_history_entities:
+            if overwrite:
+                del self.training_history_entities[entity_name]
+            else:
+                return
+
         epochs_with_params = set(self.training_history_entities[parameters[0]].epochs)
         for param in parameters[1:]:
             cur_epochs = set(self.training_history_entities[param].epochs)
@@ -106,7 +113,13 @@ class BaseTrainingLog:
 
     def add_entity_end_result_by_augmentation(self, entity_name: str,
                                               parameters: List[str],
-                                              augmentation_func: Callable[..., Any]):
+                                              augmentation_func: Callable[..., Any],
+                                              overwrite: bool = False):
+        if entity_name in self.end_results:
+            if overwrite:
+                del self.end_results[entity_name]
+            else:
+                return
 
         epochs_with_params = set(self.training_history_entities[parameters[0]].epochs)
         for param in parameters[1:]:

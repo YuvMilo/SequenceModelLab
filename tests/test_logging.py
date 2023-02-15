@@ -76,6 +76,23 @@ def test_BaseTrainingLog_history_augmentation():
     assert entity_history.epochs == [2, 5]
     assert entity_history.entities == [0, 1]
 
+    def augmentation_func(A, B) -> int:
+        return A+B+2
+
+    log.add_entity_history_by_augmentation(entity_name="C",
+                                           parameters=["A", "B"],
+                                           augmentation_func=augmentation_func,
+                                           overwrite=False)
+    entity_history = log.get_logged_entity_history(entity_name="C")
+    assert entity_history.epochs == [2, 5]
+    assert entity_history.entities == [0, 1]
+    log.add_entity_history_by_augmentation(entity_name="C",
+                                           parameters=["A", "B"],
+                                           augmentation_func=augmentation_func,
+                                           overwrite=True)
+    entity_history = log.get_logged_entity_history(entity_name="C")
+    assert entity_history.epochs == [2, 5]
+    assert entity_history.entities == [2, 3]
 
 def test_BaseTrainingLog_end_result_augmentation():
     import numpy as np
@@ -100,6 +117,23 @@ def test_BaseTrainingLog_end_result_augmentation():
 
     # Entity should be calculated over when all the params are avalable
     assert end_result == -3
+
+    def augmentation_func(epochs, As, Bs) -> int:
+        return min(np.min(As), np.min(Bs))+3
+
+    log.add_entity_end_result_by_augmentation(entity_name="min",
+                                              parameters=["A", "B"],
+                                              augmentation_func=augmentation_func,
+                                              overwrite=False)
+    end_result = log.get_end_result(end_result_name="min")
+    assert end_result == -3
+
+    log.add_entity_end_result_by_augmentation(entity_name="min",
+                                              parameters=["A", "B"],
+                                              augmentation_func=augmentation_func,
+                                              overwrite=True)
+    end_result = log.get_end_result(end_result_name="min")
+    assert end_result == 0
 
 
 def test_BaseTrainingLog_logged_end_results():
