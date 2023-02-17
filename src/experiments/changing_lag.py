@@ -17,7 +17,7 @@ hidden_sizes = [32, 64, 96, 128, 192]
 seq_len = np.max(hidden_sizes) * 2
 epochs = 20000
 
-NUM_TIMES = 5
+NUM_TIMES = 10
 
 
 def get_tasks_fssm(progress_bar_actor,

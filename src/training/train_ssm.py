@@ -17,7 +17,7 @@ def train_smm_over_white_noise_lag(model: SMMModel, lag: int,
                                    device: torch.device = None,
                                    plot: bool = False,
                                    min_cut: int = 1000,
-                                   early_stop: bool = True,
+                                   early_stop: bool = False,
                                    show_tqdm: bool = True):
     if device is not None:
         model.change_device(device)
@@ -81,7 +81,7 @@ def train_smm_over_white_noise_lag_multiprocess(
         num_epochs: int, logger: SSMTrainingLogger,
         plot: bool = False,
         min_cut: int = 1000,
-        early_stop: bool = True,
+        early_stop: bool = False,
         show_tqdm: bool = False,
         progress_bar_actor: ProgressBarActor = None):
 

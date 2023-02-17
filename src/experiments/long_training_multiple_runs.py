@@ -11,13 +11,13 @@ from src.experiments.utils.get_standard_tasks import get_ssm_training_task, \
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-log_param_every = 4
+log_param_every = 16
 save_dir = os.path.join("..", "results", "variance_mult")
 hidden_sizes = [64]
 seq_len = np.max(hidden_sizes) * 2
 epochs = 40000
 
-NUM_TIMES = 5
+NUM_TIMES = 10
 
 
 def get_tasks_fssm(progress_bar_actor,

@@ -19,7 +19,10 @@ def get_ssm_training_task(training_dict: dict, lag: int, hidden_size: int, epoch
                           training_uuid: str = "",
                           log_param_every: int = 1
                           ):
-
+    training_dict["lag"] = lag
+    training_dict["hidden_size"] = hidden_size
+    training_dict["epochs"] = epochs
+    training_dict["seq_len"] = seq_len
     opt = opt_str_to_opt[training_dict["opt"]]
     lr = float(training_dict["lr"])
     noise = float(training_dict["noise"])
@@ -66,6 +69,10 @@ def get_hippo_training_task(training_dict: dict, lag: int, hidden_size: int,
                             training_uuid: str = "",
                             log_param_every: int = 1
                             ):
+    training_dict["lag"] = lag
+    training_dict["hidden_size"] = hidden_size
+    training_dict["epochs"] = epochs
+    training_dict["seq_len"] = seq_len
     opt = opt_str_to_opt[training_dict["opt"]]
     lr = float(training_dict["lr"])
     dt = float(training_dict["dt"])
@@ -104,6 +111,11 @@ def get_hippo_no_training_task(training_dict: dict, lag: int, hidden_size: int,
                                training_uuid: str = "",
                                log_param_every: int = 1
                                ):
+
+    training_dict["lag"] = lag
+    training_dict["hidden_size"] = hidden_size
+    training_dict["epochs"] = epochs
+    training_dict["seq_len"] = seq_len
     opt = opt_str_to_opt[training_dict["opt"]]
     lr = float(training_dict["lr"])
     dt = float(training_dict["dt"])
@@ -154,6 +166,10 @@ def get_rot_training_task(training_dict: dict, lag: int, hidden_size: int,
                           training_uuid: str = "",
                           log_param_every: int = 1):
 
+    training_dict["lag"] = lag
+    training_dict["hidden_size"] = hidden_size
+    training_dict["epochs"] = epochs
+    training_dict["seq_len"] = seq_len
     opt = opt_str_to_opt[training_dict["opt"]]
     lr = float(training_dict["lr"])
     rot_type = training_dict["rot_type"]
