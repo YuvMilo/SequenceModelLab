@@ -84,12 +84,16 @@ def get_rot_ssm_equally_spaced(num_hidden_state: int,
                                radii: float = 0.99,
                                B_init_std: float = 2e-1,
                                C_init_std: float = 2e-1,
+                               main_diagonal_diff: float = 1,
+                               off_diagonal_ratio: float = 1,
                                trainable_param_list: List[str] = ("A", "B", "C"),
                                device: torch.device = None) -> SMMModel:
     init_func = lambda n: get_rot_ssm_equally_spaced_init(num_hidden_state=n,
                                                           radii=radii,
                                                           B_init_std=B_init_std,
                                                           C_init_std=C_init_std,
+                                                          main_diagonal_diff=main_diagonal_diff,
+                                                          off_diagonal_ratio=off_diagonal_ratio,
                                                           angle_shift=2 ** 0.5)
 
     return _get_classical_ssm(init_func=init_func,
@@ -102,13 +106,17 @@ def get_rot_ssm_one_over_n(num_hidden_state: int,
                            radii: float = 0.99,
                            B_init_std: float = 1e-1,
                            C_init_std: float = 1e-1,
+                           main_diagonal_diff: float = 1,
+                           off_diagonal_ratio: float = 1,
                            trainable_param_list: List[str] = ("A", "B", "C"),
                            device: torch.device = None) -> SMMModel:
     init_func = lambda n: get_rot_ssm_one_over_n_init(num_hidden_state=n,
                                                       radii=radii,
                                                       B_init_std=B_init_std,
                                                       C_init_std=C_init_std,
-                                                      angle_shift=2 ** 0.5)
+                                                      angle_shift=2 ** 0.5,
+                                                      main_diagonal_diff=main_diagonal_diff,
+                                                      off_diagonal_ratio=off_diagonal_ratio)
 
     return _get_classical_ssm(init_func=init_func,
                               num_hidden_state=num_hidden_state,

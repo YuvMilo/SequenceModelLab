@@ -36,6 +36,6 @@ top_hippo_no_res = [
 top_rot_res = [
     {'rot_type': 'eq', 'lr': '0.001',
      'opt': 'adam', 'model_name': 'rot'},
-    {'rot_type': 'eq', 'hidden': '64', 'lag': '60', 'lr': '0.005',
+    {'rot_type': 'eq', 'lr': '0.005',
      'opt': 'SGD', 'model_name': 'rot'}
 ]

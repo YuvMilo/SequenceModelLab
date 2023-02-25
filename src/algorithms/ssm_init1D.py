@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from typing import List
+from typing import List, Callable
 
 from src.algorithms.misc import polar_to_complex
 from src.algorithms.discretization import bilinear_discretization
@@ -61,21 +61,44 @@ def get_diag_ssm_plus_noise_init(num_hidden_state: int,
     return A, B, C, D
 
 
-def get_2x2matrix_with_eigen(eigen):
+def get_2x2matrix_with_eigen(eigen: float,
+                             main_diagonal_diff: float = 1,
+                             off_diagonal_ratio: float = 1):
+    a = eigen.real + main_diagonal_diff / 2
+    d = eigen.real - main_diagonal_diff / 2
+
+    b_times_c_abs = (eigen.imag ** 2) + ((main_diagonal_diff ** 2) / 4)
+    b = - 1 * (b_times_c_abs ** 0.5) * (off_diagonal_ratio ** 0.5)
+    c = (b_times_c_abs ** 0.5) / (off_diagonal_ratio ** 0.5)
+
     rot = torch.zeros([2, 2])
     # this matrix has eigenvalue get_real_i(i) +- i*get_imag_i(i)
-    rot[0, 0] = eigen.real
-    rot[1, 1] = eigen.real
-    rot[0, 1] = -1 * eigen.imag
-    rot[1, 0] = eigen.imag
+    rot[0, 0] = a
+    rot[1, 1] = d
+    rot[0, 1] = b
+    rot[1, 0] = c
     return rot
+
+
+def get_rot_ssm_matrix(num_hidden_state: int,
+                       get_i_eigen: Callable[[int], complex],
+                       main_diagonal_diff: float = 1,
+                       off_diagonal_ratio: float = 1):
+    A = torch.zeros([num_hidden_state, num_hidden_state])
+    for i in range(0, num_hidden_state, 2):
+        A[i:i + 2, i:i + 2] = get_2x2matrix_with_eigen(get_i_eigen(i // 2),
+                                                       main_diagonal_diff=main_diagonal_diff,
+                                                       off_diagonal_ratio=off_diagonal_ratio)
+    return A
 
 
 def get_rot_ssm_equally_spaced_init(num_hidden_state: int,
                                     radii: float = 0.99,
                                     B_init_std: float = 1e-1,
                                     C_init_std: float = 1e-1,
-                                    angle_shift: float = 2 ** 0.5):
+                                    angle_shift: float = 2 ** 0.5,
+                                    main_diagonal_diff: float = 1,
+                                    off_diagonal_ratio: float = 1):
     eff_hidden = num_hidden_state // 2
 
     def get_i_eigen(i: int) -> complex:
@@ -84,9 +107,10 @@ def get_rot_ssm_equally_spaced_init(num_hidden_state: int,
         angle = angle % (2 * np.pi)
         return polar_to_complex(radii, angle)
 
-    A = torch.zeros([num_hidden_state, num_hidden_state])
-    for i in range(0, num_hidden_state, 2):
-        A[i:i + 2, i:i + 2] = get_2x2matrix_with_eigen(get_i_eigen(i // 2))
+    A = get_rot_ssm_matrix(num_hidden_state=num_hidden_state,
+                           get_i_eigen=get_i_eigen,
+                           off_diagonal_ratio=off_diagonal_ratio,
+                           main_diagonal_diff=main_diagonal_diff)
     B = B_init_std * torch.randn([num_hidden_state, 1], dtype=torch.float)
     C = C_init_std * torch.randn([1, num_hidden_state], dtype=torch.float)
     D = torch.zeros([1, 1], dtype=torch.float)
@@ -97,14 +121,16 @@ def get_rot_ssm_equally_spaced_init(num_hidden_state: int,
 def get_rot_ssm_one_over_n_init(num_hidden_state: int,
                                 radii: float = 0.99,
                                 B_init_std: float = 1e-1,
-                                C_init_std: float = 1e-1):
-
+                                C_init_std: float = 1e-1,
+                                main_diagonal_diff: float = 1,
+                                off_diagonal_ratio: float = 1):
     def get_i_eigen(i: int) -> complex:
         return polar_to_complex(radii, 2 * np.pi / (i + 1))
 
-    A = torch.zeros([num_hidden_state, num_hidden_state])
-    for i in range(0, num_hidden_state, 2):
-        A[i:i + 2, i:i + 2] = get_2x2matrix_with_eigen(get_i_eigen(i // 2))
+    A = get_rot_ssm_matrix(num_hidden_state=num_hidden_state,
+                           get_i_eigen=get_i_eigen,
+                           off_diagonal_ratio=off_diagonal_ratio,
+                           main_diagonal_diff=main_diagonal_diff)
     B = B_init_std * torch.randn([num_hidden_state, 1], dtype=torch.float)
     C = C_init_std * torch.randn([1, num_hidden_state], dtype=torch.float)
     D = torch.zeros([1, 1], dtype=torch.float)

@@ -40,17 +40,22 @@ def get_hippo_training_task_file_name(save_dir: str, optimizer: torch.optim.Opti
 
 def get_rot_training_task_file_name(save_dir: str, optimizer: torch.optim.Optimizer,
                                     lag: int, lr: float, rot_type: str,
-                                    training_uuid: str, hidden_size: int) -> str:
+                                    training_uuid: str, hidden_size: int,
+                                    main_diagonal_diff: float = 1,
+                                    off_diagonal_ratio: float = 1
+                                    ) -> str:
     opt_str = opt_to_opt_str[optimizer]
 
     return os.path.join(save_dir,
-                        "rot_h{hidden}_{rot_type}_l{lag}_lr{lr}_o{opt}_id{training_uuid}".format(
+                        "rot_h{hidden}_{rot_type}_l{lag}_lr{lr}_o{opt}_id{training_uuid}_dd{diag_diff}_or_{off}".format(
                             lag=lag,
                             lr=lr,
                             opt=opt_str,
                             rot_type=rot_type,
                             training_uuid=training_uuid,
-                            hidden=hidden_size
+                            hidden=hidden_size,
+                            diag_diff=main_diagonal_diff,
+                            off=off_diagonal_ratio
                         ))
 
 

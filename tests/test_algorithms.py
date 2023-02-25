@@ -85,7 +85,9 @@ def test_get_rot_ssm_one_over_n():
     import numpy as np
     from src.algorithms.ssm_init1D import get_rot_ssm_one_over_n_init
 
-    A, _, _, _ = get_rot_ssm_one_over_n_init(num_hidden_state=6, radii=0.5)
+    A, _, _, _ = get_rot_ssm_one_over_n_init(num_hidden_state=6, radii=0.5,
+                                             off_diagonal_ratio=5,
+                                             main_diagonal_diff=8)
     eig = torch.linalg.eig(A).eigenvalues.numpy()
 
     wanted_eig = np.array([-0.5,
@@ -97,7 +99,9 @@ def test_get_rot_ssm_one_over_n():
     wanted_eig = sorted(wanted_eig)
     eig = sorted(eig)
 
-    assert np.allclose(wanted_eig, eig)
+    assert np.allclose(wanted_eig, eig,  atol=1e-3)
+    assert np.abs(A[0, 0] - A[1, 1]) == 8
+    assert max(np.abs(A[2, 3] / A[3, 2]), np.abs(A[3, 2] / A[2, 3])) == 5
 
 
 def test_get_rot_ssm_equally_spaced():
@@ -106,7 +110,9 @@ def test_get_rot_ssm_equally_spaced():
     from src.algorithms.ssm_init1D import get_rot_ssm_equally_spaced_init
 
     A, _, _, _ = get_rot_ssm_equally_spaced_init(num_hidden_state=6, radii=0.5,
-                                                 angle_shift=0)
+                                                 angle_shift=0,
+                                                 off_diagonal_ratio=5,
+                                                 main_diagonal_diff=8)
     eig = torch.linalg.eig(A).eigenvalues.numpy()
 
     wanted_eig = np.array([
@@ -120,7 +126,10 @@ def test_get_rot_ssm_equally_spaced():
     wanted_eig = sorted(wanted_eig)
     eig = sorted(eig)
 
-    assert np.allclose(wanted_eig, eig)
+    assert np.allclose(wanted_eig, eig,  atol=1e-3)
+    assert np.abs(A[0, 0]-A[1, 1]) == 8
+    assert max(np.abs(A[2, 3]/A[3, 2]), np.abs(A[3, 2]/A[2, 3])) == 5
+    assert np.allclose(wanted_eig, eig, atol=1e-3)
 
 
 def test_get_diag_ssm_plus_noise():

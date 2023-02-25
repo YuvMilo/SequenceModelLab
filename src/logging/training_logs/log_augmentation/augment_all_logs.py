@@ -3,7 +3,9 @@ import ray
 import glob
 from typing import List
 
-from src.logging.training_logs.log_augmentation.augmentations import *
+from src.logging.training_logs.log_augmentation.augmentations import \
+    hankel_augmentation, eig_augmentation, svd_augmentation, \
+    effective_min_loss_augmentation, effective_train_len_augmentation
 from src.logging.training_logs.base_log import BaseTrainingLog
 from src.multiprocessing.utils import ProgressBar, ProgressBarActor
 
@@ -77,11 +79,13 @@ def augment_all_logs(result_paths: List[str],
     pb.set_total(len(tasks))
     pb.print_until_done()
 
+
 def run_aug():
     ray.init(num_cpus=120)
-    result_paths = ["../results/variance_mult", "../results/changing_lag"]
+    result_paths = ["../results/variance_mult", "../results/changing_lag", "../results/rot_abo"]
     augment_all_logs(result_paths=result_paths,
                      overwrite=False)
+
 
 if __name__ == "__main__":
     run_aug

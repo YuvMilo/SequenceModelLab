@@ -164,22 +164,30 @@ def get_rot_training_task(training_dict: dict, lag: int, hidden_size: int,
                           progress_bar_actor, save_dir: str,
                           device: torch.device,
                           training_uuid: str = "",
+                          main_diagonal_diff: float = 1,
+                          off_diagonal_ratio: float = 1,
                           log_param_every: int = 1):
 
     training_dict["lag"] = lag
     training_dict["hidden_size"] = hidden_size
     training_dict["epochs"] = epochs
     training_dict["seq_len"] = seq_len
+    training_dict["main_diagonal_diff"] = main_diagonal_diff
+    training_dict["off_diagonal_ratio"] = off_diagonal_ratio
     opt = opt_str_to_opt[training_dict["opt"]]
     lr = float(training_dict["lr"])
     rot_type = training_dict["rot_type"]
 
     if rot_type == "one_over":
         model = get_rot_ssm_one_over_n(num_hidden_state=hidden_size,
-                                       device=device)
+                                       device=device,
+                                       main_diagonal_diff=main_diagonal_diff,
+                                       off_diagonal_ratio=off_diagonal_ratio)
     elif rot_type == "eq":
         model = get_rot_ssm_equally_spaced(num_hidden_state=hidden_size,
-                                           device=device)
+                                           device=device,
+                                           main_diagonal_diff=main_diagonal_diff,
+                                           off_diagonal_ratio=off_diagonal_ratio)
     else:
         raise NotImplementedError()
 
@@ -187,7 +195,9 @@ def get_rot_training_task(training_dict: dict, lag: int, hidden_size: int,
                                                   optimizer=opt, lag=lag, lr=lr,
                                                   rot_type=rot_type,
                                                   training_uuid=training_uuid,
-                                                  hidden_size=hidden_size)
+                                                  hidden_size=hidden_size,
+                                                  main_diagonal_diff=main_diagonal_diff,
+                                                  off_diagonal_ratio=off_diagonal_ratio)
 
     logger = SSMTrainingLogger(saving_path=saving_path,
                                running_params=training_dict,
