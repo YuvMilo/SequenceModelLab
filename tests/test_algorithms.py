@@ -11,26 +11,11 @@ def test_recurrent_diag_ssm_calculation_1D_output():
     C = torch.Tensor([1, 1]).to(device)
     D = torch.Tensor([100]).to(device)
 
-    ret = recurrent_diag_ssm_calculation(x, A, B, C, D)
+    identity = lambda x: x
+    hidden, outs = recurrent_diag_ssm_calculation(x, A, B, C, D, identity)
 
-    assert torch.equal(ret, torch.Tensor([[[102], [103]], [[100], [100]]]).to(device))
-
-
-def test_recurrent_diag_ssm_calculation():
-    import torch
-    from src.algorithms.ssm_calc import recurrent_diag_ssm_calculation
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    x = torch.zeros([1, 1, 2]).to(device)
-    x[0, 0, :] = torch.Tensor([1, 0])
-    A = torch.Tensor([0]).to(device)
-    B = torch.zeros([1, 2]).to(device)
-    C = torch.zeros([2, 1]).to(device)
-    D = torch.Tensor([1, 100]).to(device)
-
-    ret = recurrent_diag_ssm_calculation(x, A, B, C, D)
-
-    assert torch.equal(ret, torch.Tensor([[[1, 100]]]).to(device))
+    assert torch.equal(outs, torch.Tensor([[[102], [103]], [[100], [100]]]).to(device))
+    assert torch.equal(hidden, torch.Tensor([[[1, 1], [2, 1]], [[0, 0], [0, 0]]]).to(device))
 
 
 def test_recurrent_diag_ssm_calculation():
@@ -45,10 +30,11 @@ def test_recurrent_diag_ssm_calculation():
     C = torch.Tensor([0, 1]).to(device)
     D = torch.Tensor([100]).to(device)
 
-    ret = recurrent_ssm_calculation(x, A, B, C, D)
+    identity = lambda x: x
+    hiddens, outs = recurrent_ssm_calculation(x, A, B, C, D, identity)
 
-    assert torch.equal(ret, torch.Tensor([[[100], [101]]]).to(device))
-
+    assert torch.equal(outs, torch.Tensor([[[100], [101]]]).to(device))
+    assert torch.equal(hiddens, torch.Tensor([[[1, 0], [0, 1]]]).to(device))
 
 def test_calc_kernel():
     import torch
@@ -161,3 +147,16 @@ def test_get_hippo_cont():
     assert torch.norm(D) == 0
     assert np.allclose(B, [[1], [3**0.5]])
     assert np.allclose(A[1, 0], -1*3**0.5)
+
+def test_get_hippo_cont():
+    import torch
+    import numpy as np
+    from src.algorithms.misc import matrix_to_real_2x2block_matrix_with_same_eigenvalues
+
+    n = 20
+    A = torch.randn([n, n])
+    B = matrix_to_real_2x2block_matrix_with_same_eigenvalues(A)
+    sorted_eig_A = np.sort_complex(torch.linalg.eig(A)[0].tolist())
+    sorted_eig_B = np.sort_complex(torch.linalg.eig(B)[0].tolist())
+    assert np.allclose(sorted_eig_B, sorted_eig_A)
+    assert B.dtype==A.dtype

@@ -224,9 +224,9 @@ def test_SSMTrainingLogger():
         ssm_param_strategy=param_strat.DiscreteSMMParametrizationStrategy(
             ssm_init_strategy=init_strat.FlexibleSSMInitStrategy(
                 A_init_func=lambda n: torch.zeros([1, 1], dtype=torch.float),
-                B_init_func=lambda n: torch.zeros([1, 1], dtype=torch.float),
-                C_init_func=lambda n: torch.zeros([1, 1], dtype=torch.float),
-                D_init_func=lambda n: torch.zeros([1, 1], dtype=torch.float),
+                B_init_func=lambda n, input_dim: torch.zeros([1, 1], dtype=torch.float),
+                C_init_func=lambda n, output_dim: torch.zeros([1, 1], dtype=torch.float),
+                D_init_func=lambda n, output_dim: torch.zeros([1, 1], dtype=torch.float),
             ),
             ssm_storing_strategy=storing_strat.RealArrayStoringStrategy(),
         ),

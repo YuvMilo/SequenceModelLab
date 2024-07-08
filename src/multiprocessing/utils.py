@@ -84,7 +84,8 @@ class ProgressBar:
         passed the actor handle. Each of them calls `update` on the actor.
         When the progress meter reaches 100%, this method returns.
         """
-        pbar = tqdm(desc=self.description, total=self.total)
+        pbar = tqdm(desc=self.description, total=self.total,
+                    smoothing=0)
         while True:
             delta, counter = ray.get(self.actor.wait_for_update.remote())
             pbar.update(delta)

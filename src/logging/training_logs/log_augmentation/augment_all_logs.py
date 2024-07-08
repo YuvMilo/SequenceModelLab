@@ -10,7 +10,7 @@ from src.logging.training_logs.base_log import BaseTrainingLog
 from src.multiprocessing.utils import ProgressBar, ProgressBarActor
 
 
-@ray.remote(num_cpus=120)
+@ray.remote(num_cpus=60)
 def save_all_augmentation(log_file_path: str,
                           progress_bar_actor: ProgressBarActor,
                           overwrite: bool = True):
@@ -81,11 +81,14 @@ def augment_all_logs(result_paths: List[str],
 
 
 def run_aug():
-    ray.init(num_cpus=120)
-    result_paths = ["../results/variance_mult", "../results/changing_lag", "../results/rot_abo"]
+    ray.init(num_cpus=120, ignore_reinit_error=True)
+    # result_paths = ["../results/variance_mult",
+    #                 "../results/changing_lag",
+    #                 "../results/rot_abo"]
+    result_paths = ["../results/non_linear/changing_lag"]
     augment_all_logs(result_paths=result_paths,
                      overwrite=False)
 
 
 if __name__ == "__main__":
-    run_aug
+    run_aug()

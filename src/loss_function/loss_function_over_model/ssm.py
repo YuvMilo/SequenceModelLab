@@ -13,3 +13,11 @@ def l2_loss_with_random_noise(model: torch.nn.Module,
     variance += torch.abs(1 - k[lag]) ** 2
     loss = variance
     return loss
+
+
+def l2_loss_with_target(model: torch.nn.Module,
+                        target: torch.Tensor) -> torch.Tensor:
+    seq_len = len(target)
+    k = model.get_kernel(seq_len)
+    loss = torch.sum((target-k)**2)
+    return loss

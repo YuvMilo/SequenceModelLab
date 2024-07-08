@@ -64,13 +64,8 @@ class FlexibleSSMInitStrategy(BaseSSMInitStrategy):
 
     def get_init_params(self, num_hidden_state,
                         input_dim, output_dim):
-        if input_dim != 1 or output_dim != 1:
-            raise NotImplementedError(
-                "currently DiagHippoInitStrategy is only implemented in"
-                "1D to 1D dynamics"
-            )
 
         return self.A_init_func(num_hidden_state), \
-            self.B_init_func(num_hidden_state), \
-            self.C_init_func(num_hidden_state), \
-            self.D_init_func(num_hidden_state)
+            self.B_init_func(num_hidden_state, input_dim=input_dim), \
+            self.C_init_func(num_hidden_state, output_dim=output_dim), \
+            self.D_init_func(num_hidden_state, output_dim=output_dim)

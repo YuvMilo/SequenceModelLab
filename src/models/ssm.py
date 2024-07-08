@@ -5,7 +5,8 @@ import torch.nn as nn
 class SMMModel(nn.Module):
 
     def __init__(self, ssm_param_strategy, ssm_calc_strategy, num_hidden_state,
-                 input_dim, output_dim, trainable_param_list, device):
+                 input_dim, output_dim, trainable_param_list, device,
+                 non_linearity=lambda x: x):
         super().__init__()
 
         self.ssm_param_strategy = ssm_param_strategy
@@ -14,6 +15,7 @@ class SMMModel(nn.Module):
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.trainable_param_list = trainable_param_list
+        self.non_linearity = non_linearity
 
         # TODO - This should be a "running context"
         # Should be refactored to be a class
@@ -45,8 +47,18 @@ class SMMModel(nn.Module):
                                                        self.parameterized_D,
                                                        self.device)
 
-        out = self.ssm_calc_strategy.calc(x, A, B, C, D)
-        return out
+        hiddens, outs = self.ssm_calc_strategy.calc(x, A, B, C, D, self.non_linearity)
+        return outs
+
+    def forward_with_hiddens(self, x):
+        A, B, C, D = self.ssm_param_strategy.get_param(self.parameterized_A,
+                                                       self.parameterized_B,
+                                                       self.parameterized_C,
+                                                       self.parameterized_D,
+                                                       self.device)
+
+        hiddens, outs = self.ssm_calc_strategy.calc(x, A, B, C, D, self.non_linearity)
+        return hiddens, outs
 
     def to(self, device):
         self.device = device
