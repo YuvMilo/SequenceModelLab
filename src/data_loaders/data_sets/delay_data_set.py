@@ -2,7 +2,6 @@ import torch
 
 from src.data_loaders.data_sets.utils.signals import ConstSignalGenerator
 
-
 class DelayedSignalDataset(torch.utils.data.TensorDataset):
 
     def __init__(self, samples_num=1, seq_length=10000, lag_length=1000,
