@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="g01" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+    <option name="confirmBeforeUploading" value="false" />
+    <serverData>
+      <paths name="g01">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/fodl/yuvalmilo/SequenceModelLab/" local="$PROJECT_DIR$" web="" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="g02">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/fodl/yuvalmilo/SequenceModelLab/" local="$PROJECT_DIR$" web="" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="yuvalmilo@rack-cohenn-g01.cs.tau.ac.il:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_981" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="yuvalmilo@rack-cohenn-g01.cs.tau.ac.il:22 password (2)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_669" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="yuvalmilo@rack-cohenn-g01.cs.tau.ac.il:22 password (3)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/fodl/yuvalmilo/SequenceModelLab" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="yuvalmilo@rack-cohenn-g01.cs.tau.ac.il:22 password (4)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/fodl/yuvalmilo/SequenceModelLab" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="yuvalmilo@rack-cohenn-g02.cs.tau.ac.il:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/fodl/yuvalmilo/SequenceModelLab" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="yuvalmilo@rack-cohenn-g02.cs.tau.ac.il:22 password (2)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/fodl/yuvalmilo/SequenceModelLab" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="yuvalmilo@rack-cohenn-g02.cs.tau.ac.il:22 password (3)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/fodl/yuvalmilo/SequenceModelLab" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

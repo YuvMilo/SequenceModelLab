@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.nox/lint-3-8/Lib" />
+      <excludeFolder url="file://$MODULE_DIR$/.nox/lint-3-8/Scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/.nox/tests-3-8/Lib" />
+      <excludeFolder url="file://$MODULE_DIR$/.nox/tests-3-8/Scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/.pytest_cache/v" />
+      <excludeFolder url="file://$MODULE_DIR$/src/experiments/deep" />
+      <excludeFolder url="file://$MODULE_DIR$/src/experiments/full_vs_diags" />
+      <excludeFolder url="file://$MODULE_DIR$/src/experiments/results" />
+      <excludeFolder url="file://$MODULE_DIR$/src/experiments/rot_vs_random" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/.pytest_cache/v" />
+    </content>
+    <orderEntry type="jdk" jdkName="Poetry (SequenceModelLab)" jdkType="Python SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="format" value="PLAIN" />
+    <option name="myDocStringFormat" value="Plain" />
+  </component>
+</module>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="a810864d-149a-4c7b-ac6e-d6d72ace9929" name="g01">
+        <fileTransfer accessType="SFTP" host="rack-cohenn-g01.cs.tau.ac.il" port="22" sshConfigId="0c1baa41-55d1-44dc-b91c-75716b559562" sshConfig="yuvalmilo@rack-cohenn-g01.cs.tau.ac.il:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="ca0f3fbe-fc77-43af-a280-7501bee44bbf" name="g02">
+        <fileTransfer accessType="SFTP" host="rack-cohenn-g01.cs.tau.ac.il" port="22" sshConfigId="0c1baa41-55d1-44dc-b91c-75716b559562" sshConfig="yuvalmilo@rack-cohenn-g01.cs.tau.ac.il:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
